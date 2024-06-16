@@ -29,9 +29,6 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: List files in build context
-        run: ls -alh
-
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -45,7 +42,7 @@ jobs:
       - name: Build & Push
         uses: docker/build-push-action@v5
         with:
-          file: Dockerfile
+          context: .
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
