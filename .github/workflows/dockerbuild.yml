@@ -5,6 +5,11 @@ on:
     branches:
       - "master"
       - "docker"
+    paths:
+      - "src/**"
+      - "workers/**"
+      - "**/*.js"
+      - "package.json"
   workflow_dispatch: {}
 
 concurrency:
