@@ -29,6 +29,9 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: List files in build context
+        run: ls -alh
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
