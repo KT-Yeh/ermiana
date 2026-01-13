@@ -3,7 +3,7 @@ import { embedSuppresser } from '../events/embedSuppresser.js';
 import { backupLinkSender } from '../events/backupLinkSender.js';
 import { handleAPIRequest } from './apiHandlerHelper.js';
 
-export async function handlePttRegexAPI(result, message, spoiler) {
+export async function pttHandler(result, message, spoiler) {
   const board = result[1];
   const postId = result[2];
 

@@ -2,7 +2,7 @@ import { messageSender } from '../events/messageSender.js';
 import { embedSuppresser } from '../events/embedSuppresser.js';
 import { handleAPIPostRequest } from './apiHandlerHelper.js';
 
-export async function handleTiktokRegexAPI(result, message, spoiler) {
+export async function tiktokHandler(result, message, spoiler) {
   const url = result[0];
 
   await handleAPIPostRequest({

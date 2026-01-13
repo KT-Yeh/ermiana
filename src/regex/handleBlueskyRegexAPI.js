@@ -5,7 +5,7 @@ import { videoLinkSender } from '../events/videoLinkSender.js';
 import { backupLinkSender } from '../events/backupLinkSender.js';
 import { handleAPIRequest } from './apiHandlerHelper.js';
 
-export async function handleBlueskyRegexAPI(result, message, spoiler) {
+export async function blueskyHandler(result, message, spoiler) {
   await handleAPIRequest({
     platform: 'bluesky',
     apiPath: `/api/v1/bluesky/${result[1]}/${result[2]}`,

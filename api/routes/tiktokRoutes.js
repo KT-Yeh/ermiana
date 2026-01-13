@@ -4,13 +4,13 @@ import { TiktokService } from '../services/tiktokService.js';
 const router = express.Router();
 
 /**
- * POST /api/v1/tiktok
+ * GET /api/v1/tiktok?url=xxx
  * Get TikTok video data
- * Body: { url: string }
+ * Query: { url: string }
  */
-router.post('/', async (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
-    const { url } = req.body;
+    const { url } = req.query;
 
     if (!url || !url.includes('tiktok.com')) {
       return res.status(400).json({

@@ -37,18 +37,18 @@ export async function delMsgCommand(interaction) {
       if (interaction.targetMessage.deletable) {
         try {
           await interaction.targetMessage.delete()
-              .then(() => {
-                if (interaction.targetMessage.reference?.messageId) {
-                  interaction.reply( { content: (locales.sucess[interaction.locale] ?? locales.sucess['en-US']) });
-                } else if (interaction.targetMessage.interaction?.id) {
-                  interaction.reply( { content: (locales.sucess[interaction.locale] ?? locales.sucess['en-US']) });
-                } else {
-                  interaction.reply( { content: (locales.sucess[interaction.locale] ?? locales.sucess['en-US']), ephemeral: true });
-                }
-              })
-              .catch(() => {
-                interaction.reply( { content: (locales.fail[interaction.locale] ?? locales.fail['en-US']), ephemeral: true });
-              });
+            .then(() => {
+              if (interaction.targetMessage.reference?.messageId) {
+                interaction.reply( { content: (locales.sucess[interaction.locale] ?? locales.sucess['en-US']) });
+              } else if (interaction.targetMessage.interaction?.id) {
+                interaction.reply( { content: (locales.sucess[interaction.locale] ?? locales.sucess['en-US']) });
+              } else {
+                interaction.reply( { content: (locales.sucess[interaction.locale] ?? locales.sucess['en-US']), ephemeral: true });
+              }
+            })
+            .catch(() => {
+              interaction.reply( { content: (locales.fail[interaction.locale] ?? locales.fail['en-US']), ephemeral: true });
+            });
         } catch {
           interaction.reply( { content: (locales.fail[interaction.locale] ?? locales.fail['en-US']), ephemeral: true });
         }
@@ -58,5 +58,7 @@ export async function delMsgCommand(interaction) {
     } else {
       interaction.reply( { content: (locales.notMyMessage[interaction.locale] ?? locales.notMyMessage['en-US']), ephemeral: true });
     }
-  } catch {}
+  } catch (error) {
+    console.error('Error in delMsgCommand:', error);
+  }
 }

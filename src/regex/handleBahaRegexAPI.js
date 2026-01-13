@@ -1,7 +1,7 @@
 import { messageSender } from '../events/messageSender.js';
 import { handleAPIRequest } from './apiHandlerHelper.js';
 
-export async function handleBahaRegexAPI(result, message, spoiler) {
+export async function bahaHandler(result, message, spoiler) {
   await handleAPIRequest({
     platform: 'baha',
     apiPath: `/api/v1/baha/${result[1]}`,

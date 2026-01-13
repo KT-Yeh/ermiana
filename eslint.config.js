@@ -3,7 +3,7 @@ import js from '@eslint/js';
 export default [
   js.configs.recommended,
   {
-    ignores: ['deno/**', 'doc/**', 'node_modules/**', 'pic/**', 'workers/**'],
+    ignores: ['node_modules/**'],
   },
   {
     files: ['**/*.js', '**/*.mjs'],
@@ -56,6 +56,22 @@ export default [
       'new-cap': ['error', {
         capIsNewExceptions: ['Router'],
       }],
+    },
+  },
+  {
+    files: ['api/public/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'script',
+      globals: {
+        document: 'readonly',
+        window: 'readonly',
+        fetch: 'readonly',
+        alert: 'readonly',
+        FormData: 'readonly',
+        Date: 'readonly',
+        URLSearchParams: 'readonly',
+      },
     },
   },
 ];

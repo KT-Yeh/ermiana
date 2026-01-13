@@ -4,16 +4,17 @@ import helmet from 'helmet';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { configManager } from '../src/utils/configManager.js';
-import twitterRouter from './routes/twitter.js';
-import pixivRouter from './routes/pixiv.js';
-import plurkRouter from './routes/plurk.js';
-import blueskyRouter from './routes/bluesky.js';
-import bahaRouter from './routes/baha.js';
-import ehRouter from './routes/eh.js';
-import pchomeRouter from './routes/pchome.js';
-import misskeyRouter from './routes/misskey.js';
-import tiktokRouter from './routes/tiktok.js';
-import bilibiliRouter from './routes/bilibili.js';
+import { initializeBahaAuth } from './utils/bahaAuth.js';
+import twitterRouter from './routes/twitterRoutes.js';
+import pixivRouter from './routes/pixivRoutes.js';
+import plurkRouter from './routes/plurkRoutes.js';
+import blueskyRouter from './routes/blueskyRoutes.js';
+import bahaRouter from './routes/bahaRoutes.js';
+import ehRouter from './routes/ehRoutes.js';
+import pchomeRouter from './routes/pchomeRoutes.js';
+import misskeyRouter from './routes/misskeyRoutes.js';
+import tiktokRouter from './routes/tiktokRoutes.js';
+import bilibiliRouter from './routes/bilibiliRoutes.js';
 import instagramRouter from './routes/instagramRoutes.js';
 import threadsRouter from './routes/threadsRoutes.js';
 import pttRouter from './routes/pttRoutes.js';
@@ -35,7 +36,7 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
+      imgSrc: ["'self'", 'data:', 'https:'],
     },
   },
 }));
@@ -98,8 +99,15 @@ app.get('/api/v1', (req, res) => {
 // Error handler (must be last)
 app.use(errorHandler);
 
-app.listen(PORT, () => {
+// Initialize Baha authentication and start server
+app.listen(PORT, async () => {
   console.log(`API Server running on port ${PORT}`);
+  // Initialize Baha authentication (login and setup cron job)
+  try {
+    await initializeBahaAuth();
+  } catch (error) {
+    console.error('Failed to initialize Baha authentication:', error.message);
+  }
 });
 
 export default app;

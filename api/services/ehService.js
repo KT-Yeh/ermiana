@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { createStandardResponse, createErrorResponse } from '../utils/responseFormatter.js';
 
 export class EhService {
   static async getGalleryData(galleryId, token) {
@@ -75,25 +76,51 @@ export class EhService {
       const metadata = response.data.gmetadata[0];
       const processedTags = processTags(metadata.tags || []);
 
-      return {
+      // 建立標籤字串
+      const translateTags = [];
+      processedTags.forEach((tagGroup) => {
+        const values = tagGroup.tags.join(', ');
+        translateTags.push(tagGroup.translatedType + ': ' + values);
+      });
+
+      return createStandardResponse({
         success: true,
-        data: {
-          id: galleryId,
-          token,
-          url: `https://e-hentai.org/g/${galleryId}/${token}`,
-          exhentaiUrl: `https://exhentai.org/g/${galleryId}/${token}`,
+        style: 'normal',
+        color: '0xe95959',
+        name: {
           title: metadata.title,
-          titleJpn: metadata.title_jpn || '',
-          thumbnail: metadata.thumb,
-          category: metadata.category,
-          rating: metadata.rating,
-          uploader: metadata.uploader,
-          posted: metadata.posted,
-          filecount: metadata.filecount,
-          filesize: metadata.filesize,
-          tags: processedTags,
+          url: `https://e-hentai.org/g/${galleryId}/${token}`,
         },
-      };
+        description: metadata.title_jpn || '',
+        image: metadata.thumb,
+        fields: [
+          {
+            name: '類別',
+            value: metadata.category,
+            inline: true,
+          },
+          {
+            name: '評分',
+            value: metadata.rating.toString(),
+            inline: true,
+          },
+          {
+            name: '上傳者',
+            value: metadata.uploader,
+            inline: true,
+          },
+          {
+            name: '標籤',
+            value: translateTags.join('\n'),
+            inline: false,
+          },
+        ],
+        footer: {
+          text: 'ermiana',
+          iconurl: 'https://ermiana.canaria.cc/pic/eh.png',
+        },
+        timestamp: metadata.posted * 1000,
+      });
     } catch (error) {
       // Retry once after waiting
       try {
@@ -118,32 +145,57 @@ export class EhService {
         const metadata = retryResponse.data.gmetadata[0];
         const processedTags = processTags(metadata.tags || []);
 
-        return {
+        // 建立標籤字串
+        const translateTags = [];
+        processedTags.forEach((tagGroup) => {
+          const values = tagGroup.tags.join(', ');
+          translateTags.push(tagGroup.translatedType + ': ' + values);
+        });
+
+        return createStandardResponse({
           success: true,
-          data: {
-            id: galleryId,
-            token,
-            url: `https://e-hentai.org/g/${galleryId}/${token}`,
-            exhentaiUrl: `https://exhentai.org/g/${galleryId}/${token}`,
+          style: 'normal',
+          color: '0xe95959',
+          name: {
             title: metadata.title,
-            titleJpn: metadata.title_jpn || '',
-            thumbnail: metadata.thumb,
-            category: metadata.category,
-            rating: metadata.rating,
-            uploader: metadata.uploader,
-            posted: metadata.posted,
-            filecount: metadata.filecount,
-            filesize: metadata.filesize,
-            tags: processedTags,
+            url: `https://e-hentai.org/g/${galleryId}/${token}`,
           },
-        };
+          description: metadata.title_jpn || '',
+          image: metadata.thumb,
+          fields: [
+            {
+              name: '類別',
+              value: metadata.category,
+              inline: true,
+            },
+            {
+              name: '評分',
+              value: metadata.rating.toString(),
+              inline: true,
+            },
+            {
+              name: '上傳者',
+              value: metadata.uploader,
+              inline: true,
+            },
+            {
+              name: '標籤',
+              value: translateTags.join('\n'),
+              inline: false,
+            },
+          ],
+          footer: {
+            text: 'ermiana',
+            iconurl: 'https://ermiana.canaria.cc/pic/eh.png',
+          },
+          timestamp: metadata.posted * 1000,
+        });
       } catch (retryError) {
         console.error('E-Hentai API Error (both attempts failed):', retryError.message);
-        throw {
-          statusCode: retryError.response?.status || 500,
-          message: retryError.message || 'Failed to fetch E-Hentai data after retry',
-          code: 'EH_API_ERROR',
-        };
+        throw createErrorResponse(
+          retryError.message || 'Failed to fetch E-Hentai data after retry',
+          'EH_API_ERROR',
+        );
       }
     }
   }

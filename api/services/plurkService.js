@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import { createStandardResponse, createErrorResponse } from '../utils/responseFormatter.js';
 
 function sanitizeHtmlContent(input) {
   let previous;
@@ -41,33 +42,59 @@ export class PlurkService {
       const plurkAvatar = scriptText.match(/"avatar":\s*(\d+)/)?.[1] || '79721750';
       const plurkNickName = scriptText.match(/"nick_name":\s*"([^"]+)"/)?.[1] || 'plurkuser';
 
-      return {
+      // 統計資訊
+      const statsInfo = `💬${respPlurk} 🔁${rePlurk} ❤️${favPlurk}`;
+
+      // 決定 style
+      let style = 'normal';
+      let image = null;
+      let imageArray = null;
+
+      if (picPlurk.length === 0) {
+        style = 'normal';
+      } else if (picPlurk.length === 1) {
+        style = 'normal';
+        image = picPlurk[0];
+      } else {
+        style = 'more';
+        image = picPlurk[0];
+        imageArray = picPlurk.slice(1, 4);
+      }
+
+      // 建立標準回應
+      const responseData = {
         success: true,
-        data: {
-          id: plurkId,
+        style,
+        color: '0xefa54c',
+        author: {
+          text: `@${plurkNickName}`,
+          iconurl: `https://avatars.plurk.com/${plurkUserId}-medium${plurkAvatar}.gif`,
+        },
+        name: {
+          title: plurkName,
           url: `https://www.plurk.com/p/${plurkId}`,
-          author: {
-            id: plurkUserId,
-            nickname: plurkNickName,
-            displayName: plurkName,
-            avatar: `https://avatars.plurk.com/${plurkUserId}-medium${plurkAvatar}.gif`,
-          },
-          content: plurkContent,
-          images: picPlurk,
-          stats: {
-            responses: parseInt(respPlurk),
-            replurks: parseInt(rePlurk),
-            favorites: parseInt(favPlurk),
-          },
+        },
+        description: plurkContent,
+        footer: {
+          text: statsInfo,
+          iconurl: 'https://ermiana.canaria.cc/pic/plurk.png',
         },
       };
+
+      if (image) {
+        responseData.image = image;
+      }
+      if (imageArray) {
+        responseData.imageArray = imageArray;
+      }
+
+      return createStandardResponse(responseData);
     } catch (error) {
       console.error('Plurk API Error:', error.message);
-      throw {
-        statusCode: error.response?.status || 500,
-        message: error.message || 'Failed to fetch Plurk data',
-        code: 'PLURK_API_ERROR',
-      };
+      throw createErrorResponse(
+        error.message || 'Failed to fetch Plurk data',
+        'PLURK_API_ERROR',
+      );
     }
   }
 }

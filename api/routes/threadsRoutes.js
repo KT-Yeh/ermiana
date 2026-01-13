@@ -3,9 +3,9 @@ import { getThreadsData } from '../services/threadsService.js';
 
 const router = express.Router();
 
-router.post('/', async (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
-    const { url } = req.body;
+    const { url } = req.query;
 
     if (!url) {
       return res.status(400).json({
@@ -16,10 +16,7 @@ router.post('/', async (req, res, next) => {
 
     const data = await getThreadsData(url);
 
-    res.json({
-      success: true,
-      data,
-    });
+    res.json(data);
   } catch (error) {
     next(error);
   }

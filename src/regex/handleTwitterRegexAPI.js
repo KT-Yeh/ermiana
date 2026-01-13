@@ -4,7 +4,7 @@ import { videoLinkSender } from '../events/videoLinkSender.js';
 import { backupLinkSender } from '../events/backupLinkSender.js';
 import { handleAPIRequest } from './apiHandlerHelper.js';
 
-export async function handleTwitterRegexAPI(result, message, spoiler) {
+export async function twitterHandler(result, message, spoiler) {
   const tid = result[1];
 
   await handleAPIRequest({

@@ -13,7 +13,7 @@ const client = new Client({
   ],
 });
 
-client.on('ready', async () => {
+client.on('clientReady', async () => {
   console.log(`Ready! 以 ${client.user.tag} 身分登入`);
   currentTime();
   try {
@@ -23,14 +23,14 @@ client.on('ready', async () => {
       client.shard.broadcastEval((c) => c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0)),
     ];
     Promise.all(promises)
-        .then((results) => {
-          const serverCount = results[0].reduce((acc, guildCount) => acc + guildCount, 0);
-          const totalUserCount = results[1].reduce((acc, memberCount) => acc + memberCount, 0);
-          console.log(`正在 ${serverCount} 個伺服器上運作中`);
-          console.log(`正在服務 ${totalUserCount} 位使用者`);
-          reloadLog(serverCount, totalUserCount);
-        })
-        .catch(console.error);
+      .then((results) => {
+        const serverCount = results[0].reduce((acc, guildCount) => acc + guildCount, 0);
+        const totalUserCount = results[1].reduce((acc, memberCount) => acc + memberCount, 0);
+        console.log(`正在 ${serverCount} 個伺服器上運作中`);
+        console.log(`正在服務 ${totalUserCount} 位使用者`);
+        reloadLog(serverCount, totalUserCount);
+      })
+      .catch(console.error);
   } catch {
     return;
   }

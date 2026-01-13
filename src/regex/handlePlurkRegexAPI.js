@@ -3,7 +3,7 @@ import { messageSenderMore } from '../events/messageSenderMore.js';
 import { embedSuppresser } from '../events/embedSuppresser.js';
 import { handleAPIRequest } from './apiHandlerHelper.js';
 
-export async function handlePlurkRegexAPI(result, message, spoiler) {
+export async function plurkHandler(result, message, spoiler) {
   await handleAPIRequest({
     platform: 'plurk',
     apiPath: `/api/v1/plurk/${result[1]}`,

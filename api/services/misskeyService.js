@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { createStandardResponse, createErrorResponse } from '../utils/responseFormatter.js';
 
 export class MisskeyService {
   static async getNoteData(noteId) {
@@ -16,50 +17,67 @@ export class MisskeyService {
 
       const note = response.data;
 
-      const media = {
-        images: note.files?.filter((f) => f.type.startsWith('image/')).map((f) => ({
-          url: f.url,
-          thumbnailUrl: f.thumbnailUrl,
-          type: f.type,
-          isSensitive: f.isSensitive,
-        })) || [],
-        videos: note.files?.filter((f) => f.type.startsWith('video/')).map((f) => ({
-          url: f.url,
-          thumbnailUrl: f.thumbnailUrl,
-          type: f.type,
-          isSensitive: f.isSensitive,
-        })) || [],
-      };
+      // 處理媒體檔案
+      const images = note.files?.filter((f) => f.type.startsWith('image/')) || [];
+      const videos = note.files?.filter((f) => f.type.startsWith('video/')) || [];
 
-      return {
+      // 統計資訊（反應總數）
+      const totalReactions = Object.values(note.reactions || {}).reduce((a, b) => a + b, 0);
+      const statsInfo = `💬${note.repliesCount || 0} 🔁${note.renoteCount || 0} ❤️${totalReactions}`;
+
+      // 決定 style
+      let style = 'normal';
+      let image = null;
+      let imageArray = null;
+
+      if (images.length === 0) {
+        style = 'normal';
+      } else if (images.length === 1) {
+        style = 'normal';
+        image = images[0].url;
+      } else {
+        style = 'more';
+        image = images[0].url;
+        imageArray = images.slice(1, 4).map((img) => img.url);
+      }
+
+      // 建立標準回應
+      const responseData = {
         success: true,
-        data: {
-          id: noteId,
+        style,
+        color: '0x99c539',
+        author: {
+          text: `@${note.user.username}`,
+          iconurl: note.user.avatarUrl || '',
+        },
+        name: {
+          title: note.user.name || note.user.username,
           url: `https://misskey.io/notes/${noteId}`,
-          author: {
-            id: note.user.id,
-            username: note.user.username,
-            name: note.user.name || note.user.username,
-            avatarUrl: note.user.avatarUrl,
-          },
-          text: note.text || '',
-          createdAt: note.createdAt,
-          stats: {
-            replies: note.repliesCount || 0,
-            renotes: note.renoteCount || 0,
-            reactions: Object.values(note.reactions || {}).reduce((a, b) => a + b, 0),
-          },
-          media,
-          isSensitive: note.cw !== null || media.images.some((i) => i.isSensitive) || media.videos.some((v) => v.isSensitive),
+        },
+        description: note.text || '',
+        footer: {
+          text: statsInfo,
+          iconurl: 'https://ermiana.canaria.cc/pic/misskey.png',
         },
       };
+
+      if (image) {
+        responseData.image = image;
+      }
+      if (imageArray) {
+        responseData.imageArray = imageArray;
+      }
+      if (note.createdAt) {
+        responseData.timestamp = new Date(note.createdAt).getTime();
+      }
+
+      return createStandardResponse(responseData);
     } catch (error) {
       console.error('Misskey API Error:', error.message);
-      throw {
-        statusCode: error.response?.status || 500,
-        message: error.message || 'Failed to fetch Misskey data',
-        code: 'MISSKEY_API_ERROR',
-      };
+      throw createErrorResponse(
+        error.message || 'Failed to fetch Misskey data',
+        'MISSKEY_API_ERROR',
+      );
     }
   }
 }

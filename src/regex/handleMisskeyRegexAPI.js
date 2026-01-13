@@ -3,7 +3,7 @@ import { messageSenderMore } from '../events/messageSenderMore.js';
 import { embedSuppresser } from '../events/embedSuppresser.js';
 import { handleAPIRequest } from './apiHandlerHelper.js';
 
-export async function handleMisskeyRegexAPI(result, message, spoiler) {
+export async function misskeyHandler(result, message, spoiler) {
   await handleAPIRequest({
     platform: 'misskey',
     apiPath: `/api/v1/misskey/${result[1]}/${result[2]}`,

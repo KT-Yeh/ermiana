@@ -1,7 +1,10 @@
 import axios from 'axios';
+import { createStandardResponse, createErrorResponse } from '../utils/responseFormatter.js';
 
 export class TiktokService {
   static async getVideoData(videoUrl) {
+    let proxyUrl = videoUrl.replace(/tiktok\.com/, 'tnktok.com');
+    
     // Try tnktok.com first
     try {
       const tnktokUrl = videoUrl.replace(/tiktok\.com/, 'tnktok.com');
@@ -12,14 +15,7 @@ export class TiktokService {
       });
 
       if (response.status === 200) {
-        return {
-          success: true,
-          data: {
-            originalUrl: videoUrl,
-            proxyUrl: tnktokUrl,
-            service: 'tnktok',
-          },
-        };
+        proxyUrl = tnktokUrl;
       } else {
         throw new Error('tnktok failed');
       }
@@ -34,25 +30,30 @@ export class TiktokService {
         });
 
         if (response.status === 200) {
-          return {
-            success: true,
-            data: {
-              originalUrl: videoUrl,
-              proxyUrl: tiktokezUrl,
-              service: 'tiktokez',
-            },
-          };
+          proxyUrl = tiktokezUrl;
         } else {
           throw new Error('tiktokez failed');
         }
       } catch (tiktokezError) {
         console.error('TikTok API Error (both proxies failed):', tiktokezError.message);
-        throw {
-          statusCode: 500,
-          message: 'All TikTok proxy services failed',
-          code: 'TIKTOK_API_ERROR',
-        };
+        // Use default tnktok URL
+        proxyUrl = videoUrl.replace(/tiktok\.com/, 'tnktok.com');
       }
     }
+
+    return createStandardResponse({
+      success: true,
+      style: 'backup',
+      color: '0x000000',
+      name: {
+        title: 'TikTok',
+        url: videoUrl,
+      },
+      footer: {
+        text: 'ermiana',
+        iconurl: 'https://ermiana.canaria.cc/pic/tiktok.png',
+      },
+      rollback: proxyUrl,
+    });
   }
 }

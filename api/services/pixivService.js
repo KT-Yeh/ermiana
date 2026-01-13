@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { createStandardResponse, createErrorResponse } from '../utils/responseFormatter.js';
 
 export class PixivService {
   static async getIllustData(illustId) {
@@ -70,43 +71,77 @@ export class PixivService {
       // Extract description
       const description = illust.extraData?.meta?.twitter?.description || illust.description || '';
 
-      return {
+      // Extract tags
+      const tagsString = illust.tags.tags.map((tag) => `[${tag.tag}](https://www.pixiv.net/tags/${tag.tag}/artworks)`).join(', ');
+
+      // 決定 style
+      const style = pageCount > 1 ? 'pixiv' : 'normal';
+
+      // 建立標準回應
+      const responseData = {
         success: true,
-        data: {
-          id: illustId,
+        style,
+        color: '0x0096fa',
+        name: {
           title: illust.title,
-          description: description.substring(0, 300),
           url: `https://www.pixiv.net/artworks/${illustId}`,
-          author: {
-            id: illust.userId,
-            name: illust.userName,
-            profileUrl: `https://www.pixiv.net/users/${illust.userId}`,
+        },
+        description: description.substring(0, 300),
+        fields: [
+          {
+            name: '作者',
+            value: `[${illust.userName}](https://www.pixiv.net/users/${illust.userId})`,
+            inline: true,
           },
-          images,
-          pageCount,
-          stats: {
-            bookmarks: illust.bookmarkCount,
-            views: illust.viewCount,
-            likes: illust.likeCount,
+          {
+            name: '收藏',
+            value: String(illust.bookmarkCount),
+            inline: true,
           },
-          tags,
-          createdAt: illust.createDate,
-          isR18: illust.tags.tags.some((tag) => tag.tag === 'R-18'),
-          fallbackUrl: `https://www.phixiv.net/artworks/${illustId}`,
+        ],
+        footer: {
+          text: 'ermiana',
+          iconurl: 'https://ermiana.canaria.cc/pic/pixiv.png',
         },
       };
+
+      // 添加標籤欄位
+      if (tagsString) {
+        responseData.fields.push({
+          name: '標籤',
+          value: tagsString,
+          inline: false,
+        });
+      }
+
+      // 根據 style 添加圖片
+      if (style === 'pixiv' && images.length > 0) {
+        responseData.imagePixiv = {
+          url: images[0],
+          count: pageCount,
+        };
+      } else if (style === 'normal' && images.length > 0) {
+        responseData.image = images[0];
+      }
+
+      return createStandardResponse(responseData);
     } catch (error) {
       console.error('Pixiv API Error:', error.message);
-      // Return fallback URL
-      return {
+      // Return fallback
+      return createStandardResponse({
         success: true,
-        data: {
-          id: illustId,
+        style: 'backup',
+        color: '0x0096fa',
+        name: {
+          title: 'Pixiv',
           url: `https://www.pixiv.net/artworks/${illustId}`,
-          fallbackUrl: `https://www.phixiv.net/artworks/${illustId}`,
-          error: 'API unavailable, use fallback URL',
         },
-      };
+        footer: {
+          text: 'ermiana',
+          iconurl: 'https://ermiana.canaria.cc/pic/pixiv.png',
+        },
+        rollback: `https://www.phixiv.net/artworks/${illustId}`,
+      });
     }
   }
 }

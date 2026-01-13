@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import { createStandardResponse } from '../utils/responseFormatter.js';
 
 const supportedBoards = [
   'Gossiping', 'C_Chat', 'AC_In', 'H-GAME', 'sex',
@@ -45,10 +46,20 @@ export async function getPttData(board, postId) {
   const standardizedBoard = boardNameStandardization(board);
 
   if (!supportedBoards.includes(standardizedBoard)) {
-    return {
-      error: 'Board not supported',
-      fallbackUrl: `https://www.pttweb.cc/bbs/${standardizedBoard}/${postId}`,
-    };
+    return createStandardResponse({
+      success: true,
+      style: 'backup',
+      color: '0x013370',
+      name: {
+        title: 'PTT',
+        url: `https://www.ptt.cc/bbs/${standardizedBoard}/${postId}.html`,
+      },
+      footer: {
+        text: 'ermiana',
+        iconurl: 'https://ermiana.canaria.cc/pic/ptt.png',
+      },
+      rollback: `https://www.pttweb.cc/bbs/${standardizedBoard}/${postId}`,
+    });
   }
 
   try {
@@ -111,14 +122,21 @@ export async function getPttData(board, postId) {
         }
       }
 
-      return {
-        title,
+      return createStandardResponse({
+        success: true,
+        style: 'normal',
+        color: '0x013370',
+        name: {
+          title: title,
+          url: `https://www.ptt.cc/bbs/${standardizedBoard}/${postId}.html`,
+        },
         description: enhancedDescription,
-        image,
-        board: standardizedBoard,
-        postId,
-        url: `https://www.ptt.cc/bbs/${standardizedBoard}/${postId}.html`,
-      };
+        image: image || null,
+        footer: {
+          text: 'ermiana',
+          iconurl: 'https://ermiana.canaria.cc/pic/ptt.png',
+        },
+      });
     }
 
     throw new Error('Primary PTT source failed');
@@ -179,22 +197,39 @@ export async function getPttData(board, postId) {
           }
         }
 
-        return {
-          title,
+        return createStandardResponse({
+          success: true,
+          style: 'normal',
+          color: '0x013370',
+          name: {
+            title: title,
+            url: `https://www.ptt.cc/bbs/${standardizedBoard}/${postId}.html`,
+          },
           description: enhancedDescription,
-          image,
-          board: standardizedBoard,
-          postId,
-          url: `https://www.ptt.cc/bbs/${standardizedBoard}/${postId}.html`,
-        };
+          image: image || null,
+          footer: {
+            text: 'ermiana',
+            iconurl: 'https://ermiana.canaria.cc/pic/ptt.png',
+          },
+        });
       }
 
       throw new Error('Backup PTT source failed');
     } catch (backupError) {
-      return {
-        error: 'All PTT sources unavailable',
-        fallbackUrl: `https://www.pttweb.cc/bbs/${standardizedBoard}/${postId}`,
-      };
+      return createStandardResponse({
+        success: true,
+        style: 'backup',
+        color: '0x013370',
+        name: {
+          title: 'PTT',
+          url: `https://www.ptt.cc/bbs/${standardizedBoard}/${postId}.html`,
+        },
+        footer: {
+          text: 'ermiana',
+          iconurl: 'https://ermiana.canaria.cc/pic/ptt.png',
+        },
+        rollback: `https://www.pttweb.cc/bbs/${standardizedBoard}/${postId}`,
+      });
     }
   }
 }

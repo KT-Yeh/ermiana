@@ -1,7 +1,7 @@
 import { messageSender } from '../events/messageSender.js';
 import { handleAPIRequest } from './apiHandlerHelper.js';
 
-export async function handleEhRegexAPI(result, message, spoiler) {
+export async function ehHandler(result, message, spoiler) {
   await handleAPIRequest({
     platform: 'eh',
     apiPath: `/api/v1/eh/${result[1]}/${result[2]}`,
@@ -17,10 +17,10 @@ export async function handleEhRegexAPI(result, message, spoiler) {
 
       if (data.tags && data.tags.length > 0) {
         const tagDisplay = data.tags
-            .filter((tag) => tag.namespace !== 'language')
-            .slice(0, 10)
-            .map((tag) => (tag.translation ? `${tag.translation}(${tag.name})` : tag.name))
-            .join(', ');
+          .filter((tag) => tag.namespace !== 'language')
+          .slice(0, 10)
+          .map((tag) => (tag.translation ? `${tag.translation}(${tag.name})` : tag.name))
+          .join(', ');
         if (tagDisplay) {
           embed.addFields({ name: '標籤', value: tagDisplay });
         }

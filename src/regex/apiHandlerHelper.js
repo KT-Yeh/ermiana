@@ -3,7 +3,6 @@ import axios from 'axios';
 import { typingSender } from '../events/typingSender.js';
 import { embedSuppresser } from '../events/embedSuppresser.js';
 import { configManager } from '../utils/configManager.js';
-import { PLATFORM_CONFIGS } from './platformConfigs.js';
 
 /**
  * 統一的 API 調用處理器
@@ -18,11 +17,6 @@ import { PLATFORM_CONFIGS } from './platformConfigs.js';
 export async function handleAPIRequest(options) {
   const { platform, apiPath, message, spoiler, buildEmbed, sendMessage } = options;
 
-  const platformConfig = PLATFORM_CONFIGS[platform];
-  if (!platformConfig) {
-    throw new Error(`Unknown platform: ${platform}`);
-  }
-
   typingSender(message);
   const config = await configManager();
 
@@ -35,6 +29,7 @@ export async function handleAPIRequest(options) {
 
     if (apiResp.status === 200 && apiResp.data.success) {
       const data = apiResp.data.data;
+      const platformConfig = apiResp.data.platform;
 
       // 構建基礎 Embed
       const embed = new EmbedBuilder();
@@ -52,9 +47,10 @@ export async function handleAPIRequest(options) {
       throw new Error('API returned unsuccessful response');
     }
   } catch (error) {
-    console.error(`${platformConfig.name} API handler error:`, error.message);
+    const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
+    console.error(`${platformName} API handler error:`, error.message);
     console.log(`${platform} error in guild: ${message.guild?.name || 'DM'}`);
-    
+
     // 提供更詳細的錯誤信息
     if (error.code === 'ECONNREFUSED') {
       console.error('  → API 服務器未運行或無法連接');
@@ -63,7 +59,7 @@ export async function handleAPIRequest(options) {
     } else if (error.response) {
       console.error(`  → API 響應錯誤: ${error.response.status}`);
     }
-    
+
     // 重新拋出錯誤以便上層處理 fallback
     throw error;
   }
@@ -72,11 +68,6 @@ export async function handleAPIRequest(options) {
 /* 統一的 POST API 調用處理器 */
 export async function handleAPIPostRequest(options) {
   const { platform, apiPath, message, spoiler, postData, buildEmbed, sendMessage } = options;
-
-  const platformConfig = PLATFORM_CONFIGS[platform];
-  if (!platformConfig) {
-    throw new Error(`Unknown platform: ${platform}`);
-  }
 
   typingSender(message);
   const config = await configManager();
@@ -94,6 +85,7 @@ export async function handleAPIPostRequest(options) {
 
     if (apiResp.status === 200 && apiResp.data.success) {
       const data = apiResp.data.data;
+      const platformConfig = apiResp.data.platform;
 
       const embed = new EmbedBuilder();
       embed.setColor(platformConfig.color);
@@ -106,7 +98,8 @@ export async function handleAPIPostRequest(options) {
       throw new Error('API returned unsuccessful response');
     }
   } catch (error) {
-    console.error(`${platformConfig.name} API handler error:`, error.message);
+    const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
+    console.error(`${platformName} API handler error:`, error.message);
     console.log(`${platform} error: ${message.guild.name}`);
   }
 }

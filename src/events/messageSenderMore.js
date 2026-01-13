@@ -6,19 +6,19 @@ export async function messageSenderMore(message, spoiler, iconURL, embed, textin
     const iconURL2 = iconURL || 'https://ermiana.canaria.cc/pic/canaria.png';
     embed.setFooter({ text: textinfo2, iconURL: iconURL2 });
     const button = new ButtonBuilder()
-        .setCustomId('morePictureButton')
-        .setLabel('更多圖片')
-        .setStyle(ButtonStyle.Secondary);
+      .setCustomId('morePictureButton')
+      .setLabel('更多圖片')
+      .setStyle(ButtonStyle.Secondary);
 
     const row = new ActionRowBuilder()
-        .addComponents(button);
+      .addComponents(button);
 
     linkArray.forEach((link, index) => {
       const linkButton = new ButtonBuilder()
-          .setLabel((index + 2).toString())
-          .setURL(link)
-          .setStyle(ButtonStyle.Link)
-          .setDisabled(true);
+        .setLabel((index + 2).toString())
+        .setURL(link)
+        .setStyle(ButtonStyle.Link)
+        .setDisabled(true);
       row.addComponents(linkButton);
     });
 

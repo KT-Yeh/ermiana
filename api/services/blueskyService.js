@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { createStandardResponse, createErrorResponse } from '../utils/responseFormatter.js';
 
 export class BlueskyService {
   static async getPostData(handle, postId) {
@@ -48,28 +49,59 @@ export class BlueskyService {
         }
       }
 
-      return {
+      // 統計資訊
+      const statsInfo = `💬${post.replyCount || 0} 🔁${post.repostCount || 0} ❤️${post.likeCount || 0}`;
+
+      // 決定 style
+      let style = 'normal';
+      let image = null;
+      let imageArray = null;
+
+      if (media.type === 'app.bsky.embed.video#view') {
+        style = 'backup';
+      } else if (media.images && media.images.length > 1) {
+        style = 'more';
+        image = media.images[0].fullsize;
+        imageArray = media.images.slice(1, 4).map((img) => img.fullsize);
+      } else if (media.images && media.images.length === 1) {
+        style = 'normal';
+        image = media.images[0].fullsize;
+      }
+
+      // 建立標準回應
+      const responseData = {
         success: true,
-        data: {
-          id: postId,
-          handle,
+        style,
+        color: '0x53b4ff',
+        author: {
+          text: `@${handle}`,
+          iconurl: post.author?.avatar || '',
+        },
+        name: {
+          title: post.author?.displayName || handle,
           url: `https://bsky.app/profile/${handle}/post/${postId}`,
-          author: {
-            handle: handle,
-            displayName: post.author?.displayName || handle,
-            avatar: post.author?.avatar || null,
-          },
-          text: post.record?.text || '',
-          createdAt: post.record?.createdAt || null,
-          stats: {
-            replies: post.replyCount || 0,
-            reposts: post.repostCount || 0,
-            likes: post.likeCount || 0,
-          },
-          media,
-          fallbackUrl: `https://bskx.app/profile/${handle}/post/${postId}`,
+        },
+        description: post.record?.text || '',
+        footer: {
+          text: statsInfo,
+          iconurl: 'https://ermiana.canaria.cc/pic/bluesky.png',
         },
       };
+
+      if (image) {
+        responseData.image = image;
+      }
+      if (imageArray) {
+        responseData.imageArray = imageArray;
+      }
+      if (style === 'backup') {
+        responseData.rollback = `https://r.bskx.app/profile/${handle}/post/${postId}`;
+      }
+      if (post.record?.createdAt) {
+        responseData.timestamp = new Date(post.record.createdAt).getTime();
+      }
+
+      return createStandardResponse(responseData);
     } catch (bskxError) {
       // Try official Bluesky API as backup
       try {
@@ -110,41 +142,76 @@ export class BlueskyService {
           });
         }
 
-        return {
+        // 統計資訊
+        const statsInfo = `💬${threadPost.replyCount || 0} 🔁${threadPost.repostCount || 0} ❤️${threadPost.likeCount || 0}`;
+
+        // 決定 style
+        let style = 'normal';
+        let image = null;
+        let imageArray = null;
+
+        if (media.type === 'app.bsky.embed.video#view') {
+          style = 'backup';
+        } else if (media.images && media.images.length > 1) {
+          style = 'more';
+          image = media.images[0].fullsize;
+          imageArray = media.images.slice(1, 4).map((img) => img.fullsize);
+        } else if (media.images && media.images.length === 1) {
+          style = 'normal';
+          image = media.images[0].fullsize;
+        }
+
+        // 建立標準回應
+        const responseData = {
           success: true,
-          data: {
-            id: postId,
-            handle,
+          style,
+          color: '0x53b4ff',
+          author: {
+            text: `@${handle}`,
+            iconurl: threadPost.author?.avatar || '',
+          },
+          name: {
+            title: threadPost.author?.displayName || handle,
             url: `https://bsky.app/profile/${handle}/post/${postId}`,
-            author: {
-              handle: threadPost.author?.handle || handle,
-              displayName: threadPost.author?.displayName || handle,
-              avatar: threadPost.author?.avatar || null,
-            },
-            text: threadPost.record?.text || '',
-            createdAt: threadPost.record?.createdAt || null,
-            stats: {
-              replies: threadPost.replyCount || 0,
-              reposts: threadPost.repostCount || 0,
-              likes: threadPost.likeCount || 0,
-            },
-            media,
-            fallbackUrl: `https://bskx.app/profile/${handle}/post/${postId}`,
+          },
+          description: threadPost.record?.text || '',
+          footer: {
+            text: statsInfo,
+            iconurl: 'https://ermiana.canaria.cc/pic/bluesky.png',
           },
         };
+
+        if (image) {
+          responseData.image = image;
+        }
+        if (imageArray) {
+          responseData.imageArray = imageArray;
+        }
+        if (style === 'backup') {
+          responseData.rollback = `https://r.bskx.app/profile/${handle}/post/${postId}`;
+        }
+        if (threadPost.record?.createdAt) {
+          responseData.timestamp = new Date(threadPost.record.createdAt).getTime();
+        }
+
+        return createStandardResponse(responseData);
       } catch (threadError) {
         console.error('Bluesky API Error (both APIs failed):', threadError.message);
-        // Return fallback URL instead of throwing
-        return {
+        // Return backup style
+        return createStandardResponse({
           success: true,
-          data: {
-            id: postId,
-            handle,
+          style: 'backup',
+          color: '0x53b4ff',
+          name: {
+            title: 'Bluesky',
             url: `https://bsky.app/profile/${handle}/post/${postId}`,
-            fallbackUrl: `https://bskx.app/profile/${handle}/post/${postId}`,
-            error: 'API unavailable, use fallback URL',
           },
-        };
+          footer: {
+            text: 'ermiana',
+            iconurl: 'https://ermiana.canaria.cc/pic/bluesky.png',
+          },
+          rollback: `https://bskx.app/profile/${handle}/post/${postId}`,
+        });
       }
     }
   }

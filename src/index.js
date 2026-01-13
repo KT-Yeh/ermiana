@@ -1,6 +1,5 @@
 import { ShardingManager } from 'discord.js';
 import { configManager } from './utils/configManager.js';
-import { runCronJob } from './utils/runCronJob.js';
 
 const config = await configManager();
 const manager = new ShardingManager('./src/bot.js', {
@@ -10,4 +9,3 @@ const manager = new ShardingManager('./src/bot.js', {
 
 manager.on('shardCreate', (shard) => console.log(`Launched shard ${shard.id}`));
 manager.spawn();
-runCronJob();

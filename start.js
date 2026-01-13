@@ -3,14 +3,12 @@ import { spawn } from 'child_process';
 // 啟動 API 服務器
 const api = spawn('node', ['api/server.js'], {
   stdio: 'inherit',
-  shell: true,
 });
 
 // 等待1秒後啟動 Discord.js bot
 setTimeout(() => {
   const bot = spawn('node', ['index.js'], {
     stdio: 'inherit',
-    shell: true,
   });
 
   bot.on('error', (err) => {

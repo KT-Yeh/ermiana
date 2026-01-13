@@ -2,7 +2,7 @@ import { embedSuppresser } from '../events/embedSuppresser.js';
 import { backupLinkSender } from '../events/backupLinkSender.js';
 import { handleAPIRequest } from './apiHandlerHelper.js';
 
-export async function handleInstagramRegexAPI(result, message, spoiler) {
+export async function instagramHandler(result, message, spoiler) {
   const postId = result[1];
 
   await handleAPIRequest({

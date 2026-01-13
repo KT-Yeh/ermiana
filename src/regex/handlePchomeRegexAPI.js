@@ -2,7 +2,7 @@ import { messageSender } from '../events/messageSender.js';
 import { embedSuppresser } from '../events/embedSuppresser.js';
 import { handleAPIRequest } from './apiHandlerHelper.js';
 
-export async function handlePchomeRegexAPI(result, message, spoiler) {
+export async function pchomeHandler(result, message, spoiler) {
   const pid = result[1];
 
   await handleAPIRequest({

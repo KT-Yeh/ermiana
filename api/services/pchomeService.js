@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import { createStandardResponse, createErrorResponse } from '../utils/responseFormatter.js';
 
 export class PchomeService {
   static async getProductData(productId) {
@@ -46,39 +47,57 @@ export class PchomeService {
         const brandMatch = resp2.data.match(/BrandNames":\[(.*?)\]/);
         if (brandMatch) {
           brand = unescape(brandMatch[1].replace(/\\u/g, '%u'))
-              .replace(/","/g, '_')
-              .replace(/^"|"$/g, '');
+            .replace(/","/g, '_')
+            .replace(/^"|"$/g, '');
         }
-      } catch {}
+      } catch {
+        // Ignore brand parsing errors
+      }
 
       try {
         const sloganMatch = resp2.data.match(/SloganInfo":\[(.*?)\]/);
         if (sloganMatch) {
           slogan = unescape(sloganMatch[1].replace(/\\u/g, '%u'))
-              .replace(/","/g, '\n')
-              .replace(/^"|"$/g, '');
+            .replace(/","/g, '\n')
+            .replace(/^"|"$/g, '');
         }
-      } catch {}
+      } catch {
+        // Ignore slogan parsing errors
+      }
 
-      return {
+      return createStandardResponse({
         success: true,
-        data: {
-          id: productId,
-          url: `https://24h.pchome.com.tw/prod/${productId}`,
+        style: 'normal',
+        color: '0xff6600',
+        name: {
           title: nick,
-          description: slogan,
-          image: picUrl,
-          price: price,
-          brand: brand,
+          url: `https://24h.pchome.com.tw/prod/${productId}`,
         },
-      };
+        description: slogan,
+        image: picUrl,
+        fields: [
+          {
+            name: '價格',
+            value: `NT$ ${price}`,
+            inline: true,
+          },
+          {
+            name: '品牌',
+            value: brand || '無',
+            inline: true,
+          },
+        ],
+        footer: {
+          text: 'ermiana',
+          iconurl: 'https://ermiana.canaria.cc/pic/pchome.png',
+        },
+      });
     } catch (error) {
       console.error('PChome API Error:', error.message);
-      throw {
-        statusCode: error.response?.status || 500,
-        message: error.message || 'Failed to fetch PChome data',
-        code: 'PCHOME_API_ERROR',
-      };
+      throw createErrorResponse(
+        error.message || 'Failed to fetch PChome data',
+        'PCHOME_API_ERROR',
+      );
     }
   }
 }

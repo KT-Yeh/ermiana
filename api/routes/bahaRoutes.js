@@ -21,7 +21,13 @@ router.get('/:postId', async (req, res, next) => {
       });
     }
 
-    const result = await BahaService.getPostData(postId);
+    // 組合完整 URL，包含 query string
+    const queryString = Object.keys(req.query).length > 0
+      ? '?' + Object.entries(req.query).map(([k, v]) => `${k}=${v}`).join('&')
+      : '';
+    const fullUrl = postId + queryString;
+
+    const result = await BahaService.getPostData(fullUrl);
     res.json(result);
   } catch (error) {
     next(error);

@@ -1,34 +1,18 @@
 // API handlers - 統一使用 API 處理器
-import { handleTwitterRegexAPI } from './handleTwitterRegexAPI.js';
-import { handlePixivRegexAPI } from './handlePixivRegexAPI.js';
-import { handlePlurkRegexAPI } from './handlePlurkRegexAPI.js';
-import { handleBlueskyRegexAPI } from './handleBlueskyRegexAPI.js';
-import { handleTiktokRegexAPI } from './handleTiktokRegexAPI.js';
-import { handleBilibiliRegexAPI } from './handleBilibiliRegexAPI.js';
-import { handleEhRegexAPI } from './handleEhRegexAPI.js';
-import { handlePchomeRegexAPI } from './handlePchomeRegexAPI.js';
-import { handleBahaRegexAPI } from './handleBahaRegexAPI.js';
-import { handleMisskeyRegexAPI } from './handleMisskeyRegexAPI.js';
-import { handleInstagramRegexAPI } from './handleInstagramRegexAPI.js';
-import { handleThreadsRegexAPI } from './handleThreadsRegexAPI.js';
-import { handlePttRegexAPI } from './handlePttRegexAPI.js';
-import { handleWeiboRegexAPI } from './handleWeiboRegexAPI.js';
-
-// 直接使用 API 處理器
-const twitterHandler = handleTwitterRegexAPI;
-const pixivHandler = handlePixivRegexAPI;
-const plurkHandler = handlePlurkRegexAPI;
-const blueskyHandler = handleBlueskyRegexAPI;
-const tiktokHandler = handleTiktokRegexAPI;
-const bilibiliHandler = handleBilibiliRegexAPI;
-const ehHandler = handleEhRegexAPI;
-const pchomeHandler = handlePchomeRegexAPI;
-const bahaHandler = handleBahaRegexAPI;
-const misskeyHandler = handleMisskeyRegexAPI;
-const instagramHandler = handleInstagramRegexAPI;
-const threadsHandler = handleThreadsRegexAPI;
-const pttHandler = handlePttRegexAPI;
-const weiboHandler = handleWeiboRegexAPI;
+import { twitterHandler } from './handleTwitterRegexAPI.js';
+import { pixivHandler } from './handlePixivRegexAPI.js';
+import { plurkHandler } from './handlePlurkRegexAPI.js';
+import { blueskyHandler } from './handleBlueskyRegexAPI.js';
+import { tiktokHandler } from './handleTiktokRegexAPI.js';
+import { bilibiliHandler } from './handleBilibiliRegexAPI.js';
+import { ehHandler } from './handleEhRegexAPI.js';
+import { pchomeHandler } from './handlePchomeRegexAPI.js';
+import { bahaHandler } from './handleBahaRegexAPI.js';
+import { misskeyHandler } from './handleMisskeyRegexAPI.js';
+import { instagramHandler } from './handleInstagramRegexAPI.js';
+import { threadsHandler } from './handleThreadsRegexAPI.js';
+import { pttHandler } from './handlePttRegexAPI.js';
+import { weiboHandler } from './handleWeiboRegexAPI.js';
 
 export const regexsMap = new Map([
   [/https:\/\/x\.com\/[A-Za-z0-9_]{1,15}\/status\/([0-9]+)/, twitterHandler],

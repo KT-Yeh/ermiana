@@ -4,6 +4,8 @@ export async function pagePicCommand(interaction) {
       components: [],
     });
     await interaction.reply( { content: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' });
-    console.log('button error with rickroll: '+ interaction.message.guild.name);
-  } catch {}
+    console.log('button error with rickroll: ' + interaction.message.guild.name);
+  } catch (error) {
+    console.error('Error in pagePicCommand:', error);
+  }
 }

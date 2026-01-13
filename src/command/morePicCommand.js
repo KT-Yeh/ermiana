@@ -4,10 +4,10 @@ export async function morePicCommand(interaction) {
   try {
     const picArray = [];
     await interaction.message.components[0].components
-        .filter((_button, index) => index > 0 && index < 4)
-        .forEach((button) => {
-          picArray.push(button.url);
-        });
+      .filter((_button, index) => index > 0 && index < 4)
+      .forEach((button) => {
+        picArray.push(button.url);
+      });
 
     await interaction.message.edit({
       components: [],
@@ -37,8 +37,10 @@ export async function morePicCommand(interaction) {
       await interaction.message.edit({
         components: [],
       });
-      console.log('more pic error: '+ interaction.message.guild.name);
+      console.log('more pic error: ' + interaction.message.guild.name);
       await interaction.reply( { content: '解析網址發生問題。', ephemeral: true });
     }
-  } catch {}
+  } catch (error) {
+    console.error('Error in morePicCommand:', error);
+  }
 }

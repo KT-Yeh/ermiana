@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { createStandardResponse, createErrorResponse } from '../utils/responseFormatter.js';
 
 export class TwitterService {
   static async getPostData(statusId) {
@@ -16,21 +17,8 @@ export class TwitterService {
 
       const tweet = response.data.tweet;
 
-      // Extract quote tweet info with quote media handling
-      const quote = tweet.quote ? {
-        author: tweet.quote.author?.screen_name,
-        text: tweet.quote.text,
-        url: tweet.quote.url,
-        media: tweet.quote.media ? {
-          photos: tweet.quote.media.photos?.map((p) => p.url),
-          videos: tweet.quote.media.videos?.map((v) => v.url),
-          mosaic: tweet.quote.media.mosaic ? {
-            url: (tweet.quote.media.mosaic.formats.jpeg + '?name=large').replace(/\?.*$/, '') + '?name=large',
-          } : null,
-        } : null,
-      } : null;
-
-      // Extract quote media URL for fallback
+      // 處理引用推文資訊
+      const quoteText = tweet.quote ? `\n> RT: [@${tweet.quote.author.screen_name}](${tweet.quote.url})\n` + (tweet.quote.text ? tweet.quote.text.replace(/^/gm, '> ') : '') : '';
       const quoteMediaUrl = tweet.quote ?
         (tweet.quote.media?.mosaic ?
           (tweet.quote.media.mosaic.formats.jpeg + '?name=large').replace(/\?.*$/, '') + '?name=large' :
@@ -38,42 +26,60 @@ export class TwitterService {
             (tweet.quote.media.photos[0].url + '?name=large').replace(/\?.*$/, '') + '?name=large' :
             '')) : '';
 
-      // Extract media
-      const media = tweet.media ? {
-        photos: tweet.media.photos?.map((p) => ({
-          url: (p.url + '?name=large').replace(/\?.*$/, '') + '?name=large',
-        })) || [],
-        videos: tweet.media.all?.filter((m) => m.type !== 'photo').map((m) => m.url) || [],
-        mosaic: tweet.media.mosaic ? {
-          url: tweet.media.mosaic.formats.jpeg,
-          type: tweet.media.mosaic.type,
-        } : null,
-      } : null;
+      // 處理媒體
+      const hasPhotos = tweet.media?.photos && tweet.media.photos.length > 0;
+      const hasMosaic = tweet.media?.mosaic && tweet.media.mosaic.type === 'mosaic_photo';
+      const hasVideos = tweet.media?.all && tweet.media.all.some((m) => m.type !== 'photo');
 
-      return {
+      // 統計資訊
+      const statsInfo = `💬${tweet.replies || 0} 🔁${tweet.retweets || 0} ❤️${tweet.likes || 0}`;
+
+      // 決定 style
+      let style = 'normal';
+      if (hasVideos && !hasPhotos) {
+        style = 'backup'; // 純影片使用 backup link
+      }
+
+      // 建立標準回應
+      const responseData = {
         success: true,
-        data: {
-          id: statusId,
-          author: {
-            screenName: tweet.author.screen_name,
-            name: tweet.author.name,
-            avatarUrl: tweet.author.avatar_url,
-          },
-          text: tweet.text,
-          url: tweet.url,
-          createdAt: new Date(tweet.created_timestamp * 1000).toISOString(),
-          stats: {
-            replies: tweet.replies || 0,
-            retweets: tweet.retweets || 0,
-            likes: tweet.likes || 0,
-          },
-          media,
-          quote,
-          quoteMediaUrl,
-          fallbackUrl: `https://fxtwitter.com/i/status/${statusId}`,
-          videoDirectUrl: `https://d.vxtwitter.com/i/status/${statusId}`,
+        style,
+        color: '0x1DA1F2',
+        author: {
+          text: `@${tweet.author.screen_name}`,
+          iconurl: tweet.author.avatar_url || '',
         },
+        name: {
+          title: tweet.author.name || 'Twitter.com',
+          url: tweet.url || `https://twitter.com/i/status/${statusId}`,
+        },
+        description: (tweet.text + quoteText) || '',
+        footer: {
+          text: statsInfo,
+          iconurl: 'https://ermiana.canaria.cc/pic/twitter.png',
+        },
+        timestamp: tweet.created_timestamp * 1000,
       };
+
+      // 根據媒體類型添加圖片
+      if (hasMosaic) {
+        responseData.image = tweet.media.mosaic.formats.jpeg;
+      } else if (hasPhotos && tweet.media.photos.length === 1) {
+        responseData.image = (tweet.media.photos[0].url + '?name=large').replace(/\?.*$/, '') + '?name=large';
+      } else if (hasPhotos && tweet.media.photos.length > 1) {
+        // 多張圖片時使用組合圖
+        responseData.image = tweet.media.photos[0] ? (tweet.media.photos[0].url + '?name=large').replace(/\?.*$/, '') + '?name=large' : '';
+      } else if (!hasPhotos && quoteMediaUrl) {
+        // 沒有圖片但有引用媒體
+        responseData.image = quoteMediaUrl;
+      }
+
+      // 如果是 backup style，提供備用連結
+      if (style === 'backup') {
+        responseData.rollback = `https://d.vxtwitter.com/i/status/${statusId}`;
+      }
+
+      return createStandardResponse(responseData);
     } catch (fxError) {
       // Try vxtwitter as backup
       try {
@@ -89,65 +95,80 @@ export class TwitterService {
 
         const vxData = response.data;
 
-        // Extract quote info for vxtwitter
-        const quote = vxData.qrt ? {
-          author: vxData.qrt.user_screen_name,
-          text: vxData.qrt.text,
-          url: vxData.qrt.tweetURL,
-          media: vxData.qrt.media_extended ? {
-            photos: vxData.qrt.media_extended.filter((m) => m.type === 'image').map((m) => m.url),
-            videos: vxData.qrt.media_extended.filter((m) => m.type !== 'image').map((m) => m.url),
-          } : null,
-        } : null;
-
+        // 處理引用推文
+        const quoteText = vxData.qrt ? `\n> RT: [@${vxData.qrt.user_screen_name}](${vxData.qrt.tweetURL})\n` + (vxData.qrt.text ? vxData.qrt.text.replace(/^/gm, '> ') : '') : '';
         const quoteMediaUrl = vxData.qrt ?
           (vxData.qrt.combinedMediaUrl ||
             (Array.isArray(vxData.qrt.media_extended) && vxData.qrt.media_extended.length && vxData.qrt.media_extended[0].type === 'image' ?
               vxData.qrt.media_extended[0].url : '')) : '';
 
-        // Extract media from vxtwitter
-        const media = Array.isArray(vxData.media_extended) && vxData.media_extended.length ? {
-          photos: vxData.media_extended.filter((m) => m.type === 'image').map((m) => ({
-            url: (m.url + '?name=large').replace(/\?.*$/, '') + '?name=large',
-          })),
-          videos: vxData.media_extended.filter((m) => m.type !== 'image').map((m) => m.url),
-          combinedUrl: vxData.combinedMediaUrl,
-        } : null;
+        // 處理媒體
+        const hasMedia = Array.isArray(vxData.media_extended) && vxData.media_extended.length > 0;
+        const images = hasMedia ? vxData.media_extended.filter((m) => m.type === 'image') : [];
+        const videos = hasMedia ? vxData.media_extended.filter((m) => m.type !== 'image') : [];
 
-        return {
+        // 統計資訊
+        const statsInfo = `💬${vxData.replies || 0} 🔁${vxData.retweets || 0} ❤️${vxData.likes || 0}`;
+
+        // 決定 style
+        let style = 'normal';
+        if (videos.length > 0 && images.length === 0) {
+          style = 'backup';
+        }
+
+        // 建立標準回應
+        const responseData = {
           success: true,
-          data: {
-            id: statusId,
-            author: {
-              screenName: vxData.user_screen_name,
-              name: vxData.user_name,
-              avatarUrl: vxData.user_profile_image_url,
-            },
-            text: vxData.text,
-            url: vxData.tweetURL,
-            createdAt: new Date(vxData.date_epoch * 1000).toISOString(),
-            stats: {
-              replies: vxData.replies || 0,
-              retweets: vxData.retweets || 0,
-              likes: vxData.likes || 0,
-            },
-            media,
-            quote,
-            quoteMediaUrl,
-            fallbackUrl: `https://vxtwitter.com/i/status/${statusId}`,
+          style,
+          color: '0x1DA1F2',
+          author: {
+            text: `@${vxData.user_screen_name}`,
+            iconurl: vxData.user_profile_image_url || '',
           },
+          name: {
+            title: vxData.user_name || 'Twitter.com',
+            url: vxData.tweetURL || `https://twitter.com/i/status/${statusId}`,
+          },
+          description: (vxData.text + quoteText) || '',
+          footer: {
+            text: statsInfo,
+            iconurl: 'https://ermiana.canaria.cc/pic/twitter.png',
+          },
+          timestamp: vxData.date_epoch * 1000,
         };
+
+        // 添加圖片
+        if (images.length === 1) {
+          responseData.image = (images[0].url + '?name=large').replace(/\?.*$/, '') + '?name=large';
+        } else if (images.length > 1) {
+          responseData.image = vxData.combinedMediaUrl || '';
+        } else if (!images.length && quoteMediaUrl) {
+          responseData.image = quoteMediaUrl;
+        }
+
+        // 如果是 backup style
+        if (style === 'backup') {
+          responseData.rollback = `https://vxtwitter.com/i/status/${statusId}`;
+        }
+
+        return createStandardResponse(responseData);
       } catch (vxError) {
         console.error('Twitter API Error (both fx and vx failed):', vxError.message);
-        // Return fallback URL instead of throwing
-        return {
+        // Return backup style with fallback URL
+        return createStandardResponse({
           success: true,
-          data: {
-            id: statusId,
-            fallbackUrl: `https://fxtwitter.com/i/status/${statusId}`,
-            error: 'API unavailable, use fallback URL',
+          style: 'backup',
+          color: '0x1DA1F2',
+          name: {
+            title: 'Twitter.com',
+            url: `https://twitter.com/i/status/${statusId}`,
           },
-        };
+          footer: {
+            text: 'ermiana',
+            iconurl: 'https://ermiana.canaria.cc/pic/twitter.png',
+          },
+          rollback: `https://vxtwitter.com/i/status/${statusId}`,
+        });
       }
     }
   }

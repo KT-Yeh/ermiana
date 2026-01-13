@@ -6,15 +6,15 @@ export async function morePicCommand(interaction) {
     const imageUrl = interaction.message.embeds[0].image.url;
     const picArray = [];
     await interaction.message.components[0].components
-        .filter((_button, index) => index < 4)
-        .forEach((button, index) => {
-          if (button.url !== null) {
-            picArray.push(button.url);
-          } else if (button.url === null) {
-            picArray.push(imageUrl);
-            picNow = index;
-          }
-        });
+      .filter((_button, index) => index < 4)
+      .forEach((button, index) => {
+        if (button.url !== null) {
+          picArray.push(button.url);
+        } else {
+          picArray.push(imageUrl);
+          picNow = index;
+        }
+      });
 
     const totalPage = picArray.length;
     const targetPage = (picNow + 1) >= totalPage ? 0 : (picNow + 1);
@@ -37,9 +37,9 @@ export async function morePicCommand(interaction) {
     const targetEmbed = EmbedBuilder.from(currentEmbed).setImage(picArray[targetPage]);
 
     const button = new ButtonBuilder()
-        .setCustomId('morePictureButton')
-        .setLabel('更多圖片')
-        .setStyle(ButtonStyle.Secondary);
+      .setCustomId('morePictureButton')
+      .setLabel('更多圖片')
+      .setStyle(ButtonStyle.Secondary);
     const row = new ActionRowBuilder();
 
     picArray.forEach((link, index) => {
@@ -47,10 +47,10 @@ export async function morePicCommand(interaction) {
         row.addComponents(button);
       } else {
         const linkButton = new ButtonBuilder()
-            .setLabel((index + 1).toString())
-            .setURL(link)
-            .setStyle(ButtonStyle.Link)
-            .setDisabled(true);
+          .setLabel((index + 1).toString())
+          .setURL(link)
+          .setStyle(ButtonStyle.Link)
+          .setDisabled(true);
         row.addComponents(linkButton);
       }
     });
@@ -62,15 +62,16 @@ export async function morePicCommand(interaction) {
 
     await new Promise((resolve) => setTimeout(resolve, 300));
     await interaction.deferUpdate();
-  } catch {
+  } catch (error) {
     try {
       await interaction.message.edit({
         components: [],
       });
-      console.log('more pic error: '+ interaction.message.guild.name);
+      console.log('more pic error: ' + interaction.message.guild.name);
       await interaction.reply( { content: '解析網址發生問題。', ephemeral: true });
-    } catch {
-      console.log('more pic error: '+ interaction.message.guild.name);
+    } catch (nestedError) {
+      console.error('Error in morePicCommand nested catch:', nestedError);
+      console.log('more pic error: ' + interaction.message.guild.name);
     }
   }
 }

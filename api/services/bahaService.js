@@ -1,78 +1,99 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import Conf from 'conf';
-import { reloadBahaTK } from '../../src/utils/reloadBahaTK.js';
+import { createStandardResponse, createErrorResponse } from '../utils/responseFormatter.js';
+import { getBahaTokens, reloadBahaTK } from '../utils/bahaAuth.js';
 
 export class BahaService {
   static async getPostData(postId) {
     try {
-      const ermianaBH = new Conf({ projectName: 'ermianaJS' });
+      // Step 1: 從conf取得ENUR RUNE兩個值
+      const { BAHAENUR, BAHARUNE } = getBahaTokens();
 
-      if (!ermianaBH.get('BAHAENUR') || !ermianaBH.get('BAHARUNE')) {
-        await reloadBahaTK();
-      }
-
-      const BAHAENUR = ermianaBH.get('BAHAENUR');
-      const BAHARUNE = ermianaBH.get('BAHARUNE');
-
-      const response = await axios.request({
+      // Step 2: 向伺服器端利用 ENUR RUNE兩個值取得內容
+      const bahaHTML = await axios.request({
         url: `https://forum.gamer.com.tw/${postId}`,
         method: 'get',
-        headers: { Cookie: `BAHAENUR=${BAHAENUR}; BAHARUNE=${BAHARUNE};` },
-        timeout: 5000,
+        headers: { Cookie: 'BAHAENUR=' + BAHAENUR + '; BAHARUNE=' + BAHARUNE + ';' },
+        timeout: 2500,
       });
 
-      if (response.status !== 200) {
-        throw new Error('Failed to fetch Baha data');
-      }
+      const $ = cheerio.load(bahaHTML.data);
 
-      const $ = cheerio.load(response.data);
+      const title = $('meta[property=og:title]').attr('content');
+      const description = $('meta[property=og:description]').attr('content') || '';
+      const image = $('meta[property=og:image]').attr('content') || null;
 
-      return {
-        success: true,
-        data: {
-          id: postId,
-          url: `https://forum.gamer.com.tw/${postId}`,
-          title: $('meta[property=og:title]').attr('content') || '巴哈姆特',
-          description: $('meta[property=og:description]').attr('content') || '',
-          image: $('meta[property=og:image]').attr('content') || null,
-        },
-      };
-    } catch (error) {
-      // Retry with refreshed token
-      try {
-        await reloadBahaTK();
-        const ermianaBH2 = new Conf({ projectName: 'ermianaJS' });
-        const BAHAENUR2 = ermianaBH2.get('BAHAENUR');
-        const BAHARUNE2 = ermianaBH2.get('BAHARUNE');
-
-        const response2 = await axios.request({
-          url: `https://forum.gamer.com.tw/${postId}`,
-          method: 'get',
-          headers: { Cookie: `BAHAENUR=${BAHAENUR2}; BAHARUNE=${BAHARUNE2};` },
-          timeout: 5000,
-        });
-
-        const $ = cheerio.load(response2.data);
-
-        return {
+      // Step 3-1: if 成功 輸出結果
+      if (title && title !== '巴哈姆特電玩資訊站 - 系統訊息') {
+        return createStandardResponse({
           success: true,
-          data: {
-            id: postId,
+          style: 'normal',
+          color: '0x17cc8c',
+          name: {
+            title: title,
             url: `https://forum.gamer.com.tw/${postId}`,
-            title: $('meta[property=og:title]').attr('content') || '巴哈姆特',
-            description: $('meta[property=og:description]').attr('content') || '',
-            image: $('meta[property=og:image]').attr('content') || null,
           },
-        };
-      } catch (retryError) {
-        console.error('Baha API Error:', retryError.message);
-        throw {
-          statusCode: retryError.response?.status || 500,
-          message: retryError.message || 'Failed to fetch Baha data',
-          code: 'BAHA_API_ERROR',
-        };
+          description: description,
+          image: image,
+          footer: {
+            text: 'ermiana',
+            iconurl: 'https://ermiana.canaria.cc/pic/baha.png',
+          },
+        });
       }
+
+      // Step 3-2: if 失敗 > Step 4: 執行 reloadtoken()
+      await reloadBahaTK();
+
+      // Step 5-1 & 6: 檢查是否成功取得新token並從conf取得ENUR RUNE兩個值
+      const { BAHAENUR: BAHAENUR2, BAHARUNE: BAHARUNE2 } = getBahaTokens();
+
+      if (!BAHAENUR2 || !BAHARUNE2 || BAHAENUR2 === BAHAENUR) {
+        throw new Error('Failed to reload tokens - tokens unchanged or empty');
+      }
+
+      // Step 7: 向伺服器端利用 ENUR RUNE兩個值取得內容
+      const retryHTML = await axios.request({
+        url: `https://forum.gamer.com.tw/${postId}`,
+        method: 'get',
+        headers: { Cookie: 'BAHAENUR=' + BAHAENUR2 + '; BAHARUNE=' + BAHARUNE2 + ';' },
+        timeout: 2500,
+      });
+
+      const $retry = cheerio.load(retryHTML.data);
+
+      const retryTitle = $retry('meta[property=og:title]').attr('content');
+      const retryDescription = $retry('meta[property=og:description]').attr('content') || '';
+      const retryImage = $retry('meta[property=og:image]').attr('content') || null;
+
+      // Step 8-1: if 成功 輸出結果
+      if (retryTitle && retryTitle !== '巴哈姆特電玩資訊站 - 系統訊息') {
+        return createStandardResponse({
+          success: true,
+          style: 'normal',
+          color: '0x17cc8c',
+          name: {
+            title: retryTitle,
+            url: `https://forum.gamer.com.tw/${postId}`,
+          },
+          description: retryDescription,
+          image: retryImage,
+          footer: {
+            text: 'ermiana',
+            iconurl: 'https://ermiana.canaria.cc/pic/baha.png',
+          },
+        });
+      }
+
+      // Step 8-2: if 失敗 > END API ERROR
+      throw new Error('Failed to fetch valid Baha data after retry');
+
+    } catch (error) {
+      console.error('Baha API Error:', error.message);
+      throw createErrorResponse(
+        error.message || 'Failed to fetch Baha data',
+        'BAHA_API_ERROR',
+      );
     }
   }
 }

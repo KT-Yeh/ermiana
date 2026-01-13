@@ -1,7 +1,7 @@
 import { messageSender } from '../events/messageSender.js';
 import { handleAPIRequest } from './apiHandlerHelper.js';
 
-export async function handleBilibiliRegexAPI(result, message, spoiler) {
+export async function bilibiliHandler(result, message, spoiler) {
   await handleAPIRequest({
     platform: 'bilibili',
     apiPath: `/api/v1/bilibili/${result[1]}`,

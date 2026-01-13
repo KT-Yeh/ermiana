@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import { createStandardResponse, createErrorResponse } from '../utils/responseFormatter.js';
 
 export async function getWeiboData(statusId) {
   try {
@@ -35,28 +36,48 @@ export async function getWeiboData(statusId) {
         });
       }
 
-      return {
+      // 統計資訊格式化
+      const statsText = `💬 ${data.comments_count || 0} | 🔁 ${data.reposts_count || 0} | ❤️ ${data.attitudes_count || 0}`;
+
+      return createStandardResponse({
+        success: true,
+        style: images.length > 1 ? 'more' : 'normal',
+        color: '0xe6162d',
         author: {
-          name: data.user?.screen_name || 'Unknown',
-          id: data.user?.id || '',
+          text: data.user?.screen_name || 'Unknown',
+          iconurl: data.user?.profile_image_url || '',
         },
-        text,
-        images,
-        stats: {
-          comments: data.comments_count || 0,
-          reposts: data.reposts_count || 0,
-          likes: data.attitudes_count || 0,
+        name: {
+          title: '微博動態',
+          url: `https://m.weibo.cn/detail/${statusId}`,
         },
-        url: `https://m.weibo.cn/detail/${statusId}`,
-        createdAt: data.created_at,
-      };
+        description: text,
+        ...(images.length === 1
+          ? { image: images[0] }
+          : images.length > 1
+            ? { imageArray: images }
+            : {}),
+        fields: [
+          {
+            name: '互動數據',
+            value: statsText,
+            inline: false,
+          },
+        ],
+        footer: {
+          text: 'ermiana',
+          iconurl: 'https://ermiana.canaria.cc/pic/weibo.png',
+        },
+        timestamp: new Date(data.created_at).getTime(),
+      });
     }
 
     throw new Error('Weibo API returned invalid data');
   } catch (error) {
-    return {
-      error: error.message,
-      fallbackUrl: `https://m.weibo.cn/detail/${statusId}`,
-    };
+    console.error('Weibo API Error:', error.message);
+    throw createErrorResponse(
+      error.message || 'Failed to fetch Weibo data',
+      'WEIBO_API_ERROR',
+    );
   }
 }

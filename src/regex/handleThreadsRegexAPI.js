@@ -2,7 +2,7 @@ import { embedSuppresser } from '../events/embedSuppresser.js';
 import { backupLinkSender } from '../events/backupLinkSender.js';
 import { handleAPIPostRequest } from './apiHandlerHelper.js';
 
-export async function handleThreadsRegexAPI(result, message, spoiler) {
+export async function threadsHandler(result, message, spoiler) {
   const url = result[0];
 
   await handleAPIPostRequest({

@@ -1,6 +1,9 @@
 import axios from 'axios';
+import { createStandardResponse } from '../utils/responseFormatter.js';
 
 export async function getInstagramData(postId) {
+  let proxyUrl = `https://www.ddinstagram.com/p/${postId}/`;
+
   try {
     // Try ddinstagram first
     const ddResp = await axios.request({
@@ -10,14 +13,10 @@ export async function getInstagramData(postId) {
     });
 
     if (ddResp.status === 200) {
-      return {
-        success: true,
-        proxyUrl: `https://www.ddinstagram.com/p/${postId}/`,
-        source: 'ddinstagram',
-      };
+      proxyUrl = `https://www.ddinstagram.com/p/${postId}/`;
+    } else {
+      throw new Error('ddinstagram not available');
     }
-
-    throw new Error('ddinstagram not available');
   } catch (error) {
     // Fallback to instagramez
     try {
@@ -28,20 +27,26 @@ export async function getInstagramData(postId) {
       });
 
       if (ezResp.status === 200) {
-        return {
-          success: true,
-          proxyUrl: `https://www.instagramez.com/p/${postId}/`,
-          source: 'instagramez',
-        };
+        proxyUrl = `https://www.instagramez.com/p/${postId}/`;
       }
-
-      throw new Error('instagramez not available');
     } catch (fallbackError) {
-      // Return fallback URL if both fail
-      return {
-        error: 'Both Instagram proxies unavailable',
-        fallbackUrl: `https://www.ddinstagram.com/p/${postId}/`,
-      };
+      // Use default ddinstagram URL
+      proxyUrl = `https://www.ddinstagram.com/p/${postId}/`;
     }
   }
+
+  return createStandardResponse({
+    success: true,
+    style: 'backup',
+    color: '0xE4405F',
+    name: {
+      title: 'Instagram',
+      url: `https://www.instagram.com/p/${postId}/`,
+    },
+    footer: {
+      text: 'ermiana',
+      iconurl: 'https://ermiana.canaria.cc/pic/instagram.png',
+    },
+    rollback: proxyUrl,
+  });
 }

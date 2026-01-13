@@ -4,7 +4,7 @@ import { backupLinkSender } from '../events/backupLinkSender.js';
 import { messageSenderPixiv } from '../events/messageSenderPixiv.js';
 import { handleAPIRequest } from './apiHandlerHelper.js';
 
-export async function handlePixivRegexAPI(result, message, spoiler) {
+export async function pixivHandler(result, message, spoiler) {
   const pid = result[1];
 
   await handleAPIRequest({

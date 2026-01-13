@@ -10,7 +10,7 @@ export async function theBPicCommand(interaction) {
         components: [],
       });
       await interaction.reply( { content: '取得圖片發生問題。', ephemeral: true });
-      console.log('button error1: '+ interaction.message.guild.name);
+      console.log('button error1: ' + interaction.message.guild.name);
       return;
     }
 
@@ -29,7 +29,7 @@ export async function theBPicCommand(interaction) {
         components: [],
       });
       await interaction.reply( { content: '取得圖片發生問題。', ephemeral: true });
-      console.log('button error2: '+ interaction.message.guild.name);
+      console.log('button error2: ' + interaction.message.guild.name);
       return;
     }
 
@@ -39,14 +39,14 @@ export async function theBPicCommand(interaction) {
         components: [],
       });
       await interaction.reply( { content: '取得圖片發生問題。', ephemeral: true });
-      console.log('button error3: '+ interaction.message.guild.name);
+      console.log('button error3: ' + interaction.message.guild.name);
       return;
-    } else if (parseInt(match[1]) !== currentPage -1) {
+    } else if (parseInt(match[1]) !== currentPage - 1) {
       await interaction.message.edit({
         components: [],
       });
       await interaction.reply( { content: '取得圖片發生問題。', ephemeral: true });
-      console.log('button error4: '+ interaction.message.guild.name);
+      console.log('button error4: ' + interaction.message.guild.name);
       return;
     } else {
       const currentEmbed = interaction.message.embeds[0];
@@ -54,12 +54,12 @@ export async function theBPicCommand(interaction) {
 
       const currentComponents = interaction.message.components[0];
       const buttonPage = new ButtonBuilder()
-          .setCustomId('pagePicture')
-          .setLabel(`${targetPage}/${totalPage}`)
-          .setStyle(ButtonStyle.Secondary)
-          .setDisabled(true);
+        .setCustomId('pagePicture')
+        .setLabel(`${targetPage}/${totalPage}`)
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(true);
       const targetComponents = new ActionRowBuilder()
-          .addComponents(currentComponents.components[0], currentComponents.components[1], buttonPage, currentComponents.components[3], currentComponents.components[4]);
+        .addComponents(currentComponents.components[0], currentComponents.components[1], buttonPage, currentComponents.components[3], currentComponents.components[4]);
 
       await interaction.message.edit({
         components: [targetComponents],
@@ -69,5 +69,7 @@ export async function theBPicCommand(interaction) {
       await new Promise((resolve) => setTimeout(resolve, 300));
       await interaction.deferUpdate();
     }
-  } catch {}
+  } catch (error) {
+    console.error('Error in theBPicCommand:', error);
+  }
 }

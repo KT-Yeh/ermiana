@@ -3,7 +3,7 @@ import { messageSenderMore } from '../events/messageSenderMore.js';
 import { embedSuppresser } from '../events/embedSuppresser.js';
 import { handleAPIRequest } from './apiHandlerHelper.js';
 
-export async function handleWeiboRegexAPI(result, message, spoiler) {
+export async function weiboHandler(result, message, spoiler) {
   const statusId = result[1];
 
   await handleAPIRequest({

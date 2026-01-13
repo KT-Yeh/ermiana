@@ -1,3 +1,4 @@
+/* eslint-env browser */
 // API Configuration
 const API_BASE_URL = 'http://localhost:3000';
 
@@ -5,14 +6,19 @@ const API_BASE_URL = 'http://localhost:3000';
 const API_ENDPOINTS = [
   {
     id: 'twitter',
-    name: 'Twitter/X',
-    icon: '𝕏',
+    name: 'Twitter',
     method: 'GET',
     path: '/api/v1/twitter/:statusId',
-    description: '取得 Twitter/X 貼文資訊',
     examples: [
-      'https://x.com/username/status/1234567890',
-      'https://twitter.com/username/status/1234567890',
+      'https://x.com/yuki_sakuna/status/2010691597260976328',
+      'https://x.com/yuki_sakuna/status/2010874508421579177',
+      'https://x.com/yuki_sakuna/status/2010654097020731517',
+      'https://x.com/Hina_Youmiya/status/2010681473054204014',
+      'https://x.com/SaotomeOtoha/status/2010667480432410638',
+      'https://x.com/chizutodesign/status/2010570188962570520',
+      'https://x.com/desumura/status/1996901194225389953',
+      'https://x.com/saruyes3/status/1885678067739431225',
+      'https://twitter.com/0712_heron/status/1846496455521091850',
     ],
     parameters: [
       { name: 'statusId', label: 'Status ID', type: 'text', required: true, placeholder: '1861318090836787295' },
@@ -22,13 +28,12 @@ const API_ENDPOINTS = [
   {
     id: 'pixiv',
     name: 'Pixiv',
-    icon: '🎨',
     method: 'GET',
     path: '/api/v1/pixiv/:illustId',
-    description: '取得 Pixiv 插畫資訊',
     examples: [
-      'https://www.pixiv.net/artworks/123456789',
-      'https://www.pixiv.net/en/artworks/123456789',
+      'https://www.pixiv.net/artworks/119640142',
+      'https://www.pixiv.net/artworks/108022680',
+      'https://www.pixiv.net/artworks/118612962',
     ],
     parameters: [
       { name: 'illustId', label: 'Illustration ID', type: 'text', required: true, placeholder: '124747892' },
@@ -38,13 +43,13 @@ const API_ENDPOINTS = [
   {
     id: 'plurk',
     name: 'Plurk',
-    icon: '💬',
     method: 'GET',
     path: '/api/v1/plurk/:plurkId',
-    description: '取得 Plurk 噗文資訊',
     examples: [
-      'https://www.plurk.com/p/abc1234',
-      'https://www.plurk.com/m/p/abc1234',
+      'https://www.plurk.com/p/3hm9hb4cbe',
+      'https://www.plurk.com/p/3gugymyask',
+      'https://www.plurk.com/p/3g7k197wby',
+      'https://www.plurk.com/p/3fhsihswfi',
     ],
     parameters: [
       { name: 'plurkId', label: 'Plurk ID', type: 'text', required: true, placeholder: '2rr6gw9mkn' },
@@ -54,12 +59,13 @@ const API_ENDPOINTS = [
   {
     id: 'bluesky',
     name: 'Bluesky',
-    icon: '🦋',
     method: 'GET',
     path: '/api/v1/bluesky/:handle/:postId',
-    description: '取得 Bluesky 貼文資訊',
     examples: [
-      'https://bsky.app/profile/username.bsky.social/post/abc123xyz',
+      'https://bsky.app/profile/asagi0398.bsky.social/post/3mcb3ny2jxk2b',
+      'https://bsky.app/profile/asagi0398.bsky.social/post/3mcb3qmmeus2b',
+      'https://bsky.app/profile/asagi0398.bsky.social/post/3mbjengg4ts2s',
+      'https://bsky.app/profile/milkshakework.bsky.social/post/3mbg3z4by4s27',
     ],
     parameters: [
       { name: 'handle', label: 'Handle', type: 'text', required: true, placeholder: 'bsky.app' },
@@ -70,28 +76,25 @@ const API_ENDPOINTS = [
   {
     id: 'tiktok',
     name: 'TikTok',
-    icon: '🎵',
-    method: 'POST',
-    path: '/api/v1/tiktok',
-    description: '取得 TikTok 影片資訊',
+    method: 'GET',
+    path: '/api/v1/tiktok?url=xxx',
     examples: [
-      'https://www.tiktok.com/@username/video/1234567890123456789',
+      'https://www.tiktok.com/@tuknekona/video/7569193652854066452',
+      'https://www.tiktok.com/@tuknekona/video/7568128141491817748',
     ],
     parameters: [
-      { name: 'url', label: 'TikTok URL', type: 'textarea', required: true, placeholder: 'https://www.tiktok.com/@username/video/1234567890123456789' },
+      { name: 'url', label: 'TikTok URL', type: 'text', required: true, placeholder: 'https://www.tiktok.com/@username/video/1234567890123456789' },
     ],
-    buildUrl: () => `/api/v1/tiktok`,
-    buildBody: (params) => ({ url: params.url }),
+    buildUrl: (params) => `/api/v1/tiktok?url=${encodeURIComponent(params.url)}`,
   },
   {
     id: 'bilibili',
     name: 'Bilibili',
-    icon: '📺',
     method: 'GET',
     path: '/api/v1/bilibili/:opusId',
-    description: '取得 Bilibili 專欄資訊',
     examples: [
-      'https://www.bilibili.com/opus/123456789',
+      'https://www.bilibili.com/opus/1031137638211387398',
+      'https://www.bilibili.com/opus/1110569897275949064',
     ],
     parameters: [
       { name: 'opusId', label: 'Opus ID', type: 'text', required: true, placeholder: '1087896863688556544' },
@@ -101,13 +104,11 @@ const API_ENDPOINTS = [
   {
     id: 'eh',
     name: 'E-Hentai',
-    icon: '📚',
     method: 'GET',
     path: '/api/v1/eh/:galleryId/:token',
-    description: '取得 E-Hentai 畫廊資訊',
     examples: [
-      'https://e-hentai.org/g/123456/abcdef1234',
-      'https://exhentai.org/g/123456/abcdef1234',
+      'https://exhentai.org/g/2435734/2cfa96d15c',
+      'https://exhentai.org/g/1937299/11f58cce1d',
     ],
     parameters: [
       { name: 'galleryId', label: 'Gallery ID', type: 'text', required: true, placeholder: '123456' },
@@ -118,12 +119,12 @@ const API_ENDPOINTS = [
   {
     id: 'pchome',
     name: 'PChome 24h',
-    icon: '🛒',
     method: 'GET',
     path: '/api/v1/pchome/:productId',
-    description: '取得 PChome 商品資訊',
     examples: [
-      'https://24h.pchome.com.tw/prod/ABCDEF-ABC123456',
+      'https://24h.pchome.com.tw/prod/DAAG8W-A900GP1PQ',
+      'https://24h.pchome.com.tw/prod/DGBQ97-A900JIZR3',
+      'https://24h.pchome.com.tw/prod/DYAJ2X-A900J9CTH',
     ],
     parameters: [
       { name: 'productId', label: 'Product ID', type: 'text', required: true, placeholder: 'ABCDEF-ABC123456' },
@@ -133,13 +134,11 @@ const API_ENDPOINTS = [
   {
     id: 'baha',
     name: '巴哈姆特',
-    icon: '🎮',
     method: 'GET',
     path: '/api/v1/baha/:postId',
-    description: '取得巴哈姆特論壇文章',
     examples: [
-      'https://forum.gamer.com.tw/C.php?bsn=60076&snA=123456',
-      'https://m.gamer.com.tw/forum/C.php?bsn=60076&snA=123456',
+      'https://forum.gamer.com.tw/C.php?bsn=60076&snA=8993965',
+      'https://forum.gamer.com.tw/C.php?bsn=60076&snA=8187231',
     ],
     parameters: [
       { name: 'postId', label: 'Post ID', type: 'text', required: true, placeholder: 'C.php?bsn=60076&snA=123456' },
@@ -149,12 +148,11 @@ const API_ENDPOINTS = [
   {
     id: 'misskey',
     name: 'Misskey',
-    icon: '🐱',
     method: 'GET',
     path: '/api/v1/misskey/:host/:noteId',
-    description: '取得 Misskey 筆記資訊',
     examples: [
-      'https://misskey.io/notes/abc123xyz',
+      'https://misskey.io/notes/9tlxngdewhcp0bf4',
+      'https://misskey.io/notes/9nwyhphjic2106u5',
     ],
     parameters: [
       { name: 'host', label: 'Host', type: 'text', required: true, placeholder: 'misskey.io' },
@@ -165,13 +163,12 @@ const API_ENDPOINTS = [
   {
     id: 'instagram',
     name: 'Instagram',
-    icon: '📷',
     method: 'GET',
     path: '/api/v1/instagram/:postId',
-    description: '取得 Instagram 貼文資訊',
     examples: [
-      'https://www.instagram.com/p/ABC123xyz/',
-      'https://www.instagram.com/reel/ABC123xyz/',
+      'https://www.instagram.com/p/DTSSrlbERxJ/',
+      'https://www.instagram.com/ringring_rin/p/DKpQ1yLT5SJ/',
+      'https://www.instagram.com/p/DRPk2kOExKA/',
     ],
     parameters: [
       { name: 'postId', label: 'Post ID', type: 'text', required: true, placeholder: 'ABC123xyz' },
@@ -181,28 +178,26 @@ const API_ENDPOINTS = [
   {
     id: 'threads',
     name: 'Threads',
-    icon: '🧵',
-    method: 'POST',
-    path: '/api/v1/threads',
-    description: '取得 Threads 貼文資訊',
+    method: 'GET',
+    path: '/api/v1/threads?url=xxx',
     examples: [
-      'https://www.threads.net/@username/post/ABC123xyz',
+      'https://www.threads.com/@kawin.travel/post/DTaC6CXk50M',
+      'https://www.threads.com/@yaywusiiszd6924842/post/DTaUvHrD1Sg',
+      'https://www.threads.com/@money85cc/post/DTagbAlEs1m',
     ],
     parameters: [
-      { name: 'url', label: 'Threads URL', type: 'textarea', required: true, placeholder: 'https://www.threads.net/@username/post/ABC123xyz' },
+      { name: 'url', label: 'Threads URL', type: 'text', required: true, placeholder: 'https://www.threads.net/@username/post/ABC123xyz' },
     ],
-    buildUrl: () => `/api/v1/threads`,
-    buildBody: (params) => ({ url: params.url }),
+    buildUrl: (params) => `/api/v1/threads?url=${encodeURIComponent(params.url)}`,
   },
   {
     id: 'ptt',
     name: 'PTT',
-    icon: '💻',
     method: 'GET',
     path: '/api/v1/ptt/:board/:postId',
-    description: '取得 PTT 文章資訊',
     examples: [
-      'https://www.ptt.cc/bbs/Gossiping/M.1234567890.A.123.html',
+      'https://www.ptt.cc/bbs/C_Chat/M.1767604234.A.400.html',
+      'https://www.ptt.cc/bbs/Gossiping/M.1768278783.A.336.html',
     ],
     parameters: [
       { name: 'board', label: 'Board', type: 'text', required: true, placeholder: 'Gossiping' },
@@ -213,12 +208,12 @@ const API_ENDPOINTS = [
   {
     id: 'weibo',
     name: 'Weibo',
-    icon: '🐦',
     method: 'GET',
     path: '/api/v1/weibo/:statusId',
-    description: '取得微博貼文資訊',
     examples: [
-      'https://m.weibo.cn/detail/1234567890123456',
+      'https://m.weibo.cn/detail/5003631202402724',
+      'https://m.weibo.cn/detail/4757909902724330',
+      'https://m.weibo.cn/detail/4980354175993175',
     ],
     parameters: [
       { name: 'statusId', label: 'Status ID', type: 'text', required: true, placeholder: '1234567890123456' },
@@ -255,7 +250,7 @@ async function checkServerStatus() {
       statusIndicator.classList.add('offline');
       statusText.textContent = 'API 異常';
     }
-  } catch (error) {
+  } catch {
     statusIndicator.classList.add('offline');
     statusText.textContent = 'API 離線';
   }
@@ -282,7 +277,6 @@ function createEndpointCard(endpoint) {
   header.className = 'endpoint-header';
   header.innerHTML = `
     <div class="endpoint-title">
-      <div class="endpoint-icon">${endpoint.icon}</div>
       <h3 class="endpoint-name">${endpoint.name}</h3>
     </div>
     <div class="endpoint-meta">
@@ -317,8 +311,8 @@ function createEndpointCard(endpoint) {
               ${param.required ? '<span class="required">*</span>' : ''}
             </label>
             ${param.type === 'textarea' ?
-              `<textarea class="form-textarea" name="${param.name}" placeholder="${param.placeholder}" ${param.required ? 'required' : ''}></textarea>` :
-              `<input type="text" class="form-input" name="${param.name}" placeholder="${param.placeholder}" ${param.required ? 'required' : ''}>`
+    `<textarea class="form-textarea" name="${param.name}" placeholder="${param.placeholder}" ${param.required ? 'required' : ''}></textarea>` :
+    `<input type="text" class="form-input" name="${param.name}" placeholder="${param.placeholder}" ${param.required ? 'required' : ''}>`
 }
           </div>
         `).join('')}
