@@ -1,10 +1,7 @@
 import { ButtonBuilder, ActionRowBuilder, ButtonStyle } from 'discord.js';
 
-export async function messageSenderMore(message, spoiler, iconURL, embed, textinfo, linkArray) {
+export async function messageSenderMore(message, spoiler, embed, linkArray) {
   try {
-    const textinfo2 = textinfo || 'ermiana';
-    const iconURL2 = iconURL || 'https://ermiana.canaria.cc/pic/canaria.png';
-    embed.setFooter({ text: textinfo2, iconURL: iconURL2 });
     const button = new ButtonBuilder()
       .setCustomId('morePictureButton')
       .setLabel('更多圖片')

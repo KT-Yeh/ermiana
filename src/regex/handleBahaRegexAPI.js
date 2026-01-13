@@ -1,35 +1,19 @@
-import { messageSender } from '../events/messageSender.js';
 import { handleAPIRequest } from './apiHandlerHelper.js';
+import { typingSender } from '../events/typingSender.js';
+import { embedSuppresser } from '../events/embedSuppresser.js';
 
 export async function bahaHandler(result, message, spoiler) {
-  await handleAPIRequest({
-    platform: 'baha',
-    apiPath: `/api/v1/baha/${result[1]}`,
-    message,
-    spoiler,
-    buildEmbed: (embed, data) => {
-      embed.setTitle(data.title);
-      embed.setURL(data.url);
+  const bahaId = result[1];
 
-      if (data.author) {
-        if (data.author.avatar) {
-          embed.setAuthor({ name: data.author.name, iconURL: data.author.avatar });
-        } else {
-          embed.setAuthor({ name: data.author.name });
-        }
-      }
-
-      if (data.content) {
-        embed.setDescription(data.content.substring(0, 300));
-      }
-
-      if (data.images && data.images.length > 0) {
-        embed.setImage(data.images[0]);
-      }
-    },
-    sendMessage: (message, spoiler, iconURL, embed, data) => {
-      const bahaInfo = data.stats?.gp ? `👍${data.stats.gp}` : '';
-      messageSender(message, spoiler, iconURL, embed, bahaInfo);
-    },
-  });
+  typingSender(message);
+  try {
+    await handleAPIRequest({
+      apiPath: `/api/v1/baha/${bahaId}`,
+      message,
+      spoiler,
+    });
+    embedSuppresser(message);
+  } catch {
+    // no backup flow; no further action
+  }
 }

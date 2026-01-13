@@ -1,10 +1,7 @@
 import { ButtonBuilder, ActionRowBuilder, ButtonStyle } from 'discord.js';
 
-export async function messageSenderPixiv(message, spoiler, iconURL, embed, textinfo, pageCount) {
+export async function messageSenderPixiv(message, spoiler, embed, pageCount) {
   try {
-    const textinfo2 = textinfo || 'ermiana';
-    const iconURL2 = iconURL || 'https://ermiana.canaria.cc/pic/canaria.png';
-    embed.setFooter({ text: textinfo2, iconURL: iconURL2 });
     const button1 = new ButtonBuilder()
       .setCustomId('theAPicture')
       .setLabel('<<')
