@@ -6,9 +6,9 @@
   "scripts": {
     "start": "node start.js",
     "start:api": "node api/server.js",
-    "start:djs": "node index.js",
-    "test:api": "node test-api-integration.js",
-    "lint": "eslint --fix src/*.js"
+    "start:djs": "node src/index.js",
+    "lint:api": "eslint --fix api/*.js",
+    "lint:djs": "eslint --fix src/*.js"
   },
   "repository": {
     "type": "git",

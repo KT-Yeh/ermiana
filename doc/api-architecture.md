@@ -8,7 +8,7 @@ ermianaJS/
 │   ├── server.js                # API 主伺服器
 │   ├── middlewares/             # 中介層
 │   │   ├── errorHandler.js     # 錯誤處理
-│   │   └── rateLimiter.js      # 速率限制
+│   │   └── ipAllowlist.js      # IP allowlist (取代速率限制)
 │   ├── routes/                  # API 路由
 │   │   ├── twitter.js
 │   │   ├── pixiv.js

@@ -20,7 +20,7 @@ import threadsRouter from './routes/threadsRoutes.js';
 import pttRouter from './routes/pttRoutes.js';
 import weiboRouter from './routes/weiboRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
-import { rateLimiter } from './middlewares/rateLimiter.js';
+import { ipAllowlist } from './middlewares/ipAllowlist.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,7 +42,8 @@ app.use(helmet({
 }));
 app.use(cors());
 app.use(express.json());
-app.use(rateLimiter);
+// IP allowlist: only localhost and configured API_WHITELIST IPs can access the API
+app.use(ipAllowlist);
 
 // Serve static files from public directory
 app.use('/public', express.static(path.join(__dirname, 'public')));

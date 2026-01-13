@@ -7,7 +7,7 @@ const api = spawn('node', ['api/server.js'], {
 
 // 等待1秒後啟動 Discord.js bot
 setTimeout(() => {
-  const bot = spawn('node', ['index.js'], {
+  const bot = spawn('node', ['src/index.js'], {
     stdio: 'inherit',
   });
 

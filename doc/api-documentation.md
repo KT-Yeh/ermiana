@@ -578,18 +578,16 @@ curl http://localhost:3000/api/v1/weibo/1234567890123456
 
 ---
 
-## 速率限制
+## 存取控制
 
-- **限制:** 每分鐘 60 次請求
-- **回應標頭:** 429 Too Many Requests
-- **錯誤回應:**
+- **行為:** 目前 API 只允許來自 localhost 或在 `.env` 中 `API_WHITELIST` 列出的 IP 存取。未在允許名單中的請求會收到 403 回應。
+- **錯誤回應範例 (403):**
 ```json
 {
   "success": false,
   "error": {
-    "message": "Too many requests",
-    "code": "RATE_LIMIT_EXCEEDED",
-    "retryAfter": 30
+    "message": "Forbidden: IP not allowed",
+    "code": "IP_NOT_ALLOWLISTED"
   }
 }
 ```
@@ -613,7 +611,7 @@ curl http://localhost:3000/api/v1/weibo/1234567890123456
 | `THREADS_API_ERROR` | Threads API 錯誤 |
 | `PTT_API_ERROR` | PTT API 錯誤 |
 | `WEIBO_API_ERROR` | Weibo API 錯誤 |
-| `RATE_LIMIT_EXCEEDED` | 超過速率限制 |
+| `IP_NOT_ALLOWLISTED` | IP 未列入允許名單 |
 | `INTERNAL_ERROR` | 內部伺服器錯誤 |
 
 ## 健康檢查

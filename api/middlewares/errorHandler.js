@@ -1,4 +1,4 @@
-export function errorHandler(err, req, res, next) {
+export function errorHandler(err, _req, res, _next) {
   console.error('API Error:', err);
 
   const statusCode = err.statusCode || 500;

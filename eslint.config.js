@@ -56,6 +56,10 @@ export default [
       'new-cap': ['error', {
         capIsNewExceptions: ['Router'],
       }],
+      'no-unused-vars': ['error', {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+      }],
     },
   },
   {
