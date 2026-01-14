@@ -18,7 +18,7 @@ services:
     build: .
     image: ghcr.io/canaria3406/ermiana:latest
     container_name: ermiana-bot
-    command: ["npm", "run", "start:djs"]
+    command: ["npm", "run", "start:bot"]
     env_file:
       - .env
     environment:

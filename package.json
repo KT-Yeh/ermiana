@@ -2,13 +2,14 @@
   "name": "ermiana",
   "version": "1.2.1",
   "description": "A discord bot that shows hidden description.",
-  "main": "index.js",
+  "main": "start.js",
   "scripts": {
     "start": "node start.js",
     "start:api": "node api/server.js",
-    "start:djs": "node src/index.js",
+    "start:bot": "node src/index.js",
+    "start:reload": "node src/reload.js",
     "lint:api": "eslint --fix api/*.js",
-    "lint:djs": "eslint --fix src/*.js"
+    "lint:bot": "eslint --fix src/*.js"
   },
   "repository": {
     "type": "git",

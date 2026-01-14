@@ -37,7 +37,7 @@ Or start separately:
 npm run start:api
 
 # Terminal 2 - Discord Bot
-npm run start:djs
+npm run start:bot
 ```
 
 ## Configuration
