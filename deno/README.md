@@ -6,7 +6,7 @@
 
 ## counter.ts
 
-- **用途**：用於計算與記錄 Discord bot 被加入的伺服器（guild）數量，作為儀表板的資料來源。
+- **用途**：用於計算並使用 KV 記錄 Discord bot 被加入的伺服器（guild）數量，作為儀表板的資料來源。
 - **替代**：用以替代舊有的 [/workers/ermiana-count.js](../workers/ermiana-count.js) 。
 
 ## Deno Deploy 
