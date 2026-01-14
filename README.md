@@ -11,7 +11,9 @@
     <a href="https://discord.gg/QBwjpHcMyw"><img src="https://img.shields.io/discord/1172363356406042684?style=flat-square&logo=Discord&logoColor=white&label=support&color=yellow"></a>
 </p>
 
-**🆕 Now with RESTful API!** 
+<p align="center">
+**🆕 Now with RESTful API!**
+</p>
 
 A Discord bot that fixes sites with broken preview by providing more detailed images and webpage content. Supports multiple popular sites in Taiwan, East Asia. 
 
