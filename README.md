@@ -11,50 +11,24 @@
     <a href="https://discord.gg/QBwjpHcMyw"><img src="https://img.shields.io/discord/1172363356406042684?style=flat-square&logo=Discord&logoColor=white&label=support&color=yellow"></a>
 </p>
 
-A Discord bot that fixes sites with broken preview by providing more detailed images and webpage content. Supports multiple popular sites in Taiwan, East Asia. 
+**🆕 Now with RESTful API!** 
 
-**🆕 Now with RESTful API!** All platform handlers have been extracted into independent API services that can be used by any application, not just Discord bots.
+A Discord bot that fixes sites with broken preview by providing more detailed images and webpage content. Supports multiple popular sites in Taiwan, East Asia. 
 
 ![demo](pic/demo20.png)
 
-## Features
+## Invite BOT
 
-- 🤖 **Discord Bot** - Automatically enhance social media links with rich embeds
-- 🌐 **RESTful API** - Access platform data programmatically via HTTP endpoints
-- 🔧 **Modular Design** - Service-oriented architecture for easy maintenance
-- 🔒 **Secure** - Rate limiting, helmet security headers, CORS support
-- 📝 **Well Documented** - Comprehensive API documentation and examples
-- 🔄 **Dual Mode** - Choose between direct processing or API server architecture
+[discord.com/application-directory/1078919650764652594](https://discord.com/application-directory/1078919650764652594)
 
-## Quick Start
-
-### Discord Bot Only (Direct Mode)
-```bash
-npm install
-npm start
-```
-
-## Getting Started
-
-This bot uses **API Mode** to process social media links through a centralized API server.
-
-### Setup
+## Setup
 
 1. Configure `.env`:
-```env
-# API server public URL (for clients)
-API_PUBLIC_URL=http://localhost:3000
-
-# Bot/client API URL (used by src components) - optional (falls back to API_PUBLIC_URL)
-BOT_USE_API_URL=http://localhost:3000
-
-API_PORT=3000
-```
 
 2. Start both services:
 ```bash
 npm install
-npm run start:all
+npm start
 ```
 
 Or start separately:
@@ -63,13 +37,7 @@ Or start separately:
 npm run start:api
 
 # Terminal 2 - Discord Bot
-npm start
-```
-
-### API Server Only
-```bash
-npm install
-npm run start:api
+npm run start:djs
 ```
 
 ## Configuration
@@ -78,83 +46,38 @@ Create a `.env` file based on `.env.example`:
 
 ```env
 # Discord Bot Configuration
-DCTK="Your Discord Bot Token"
-DCID="Your Discord Bot Client ID"
-DCWH="Your Discord Webhook URL (optional)"
-BHUD="Baha User ID (optional)"
-BHPD="Baha Password (optional)"
+DCTK=DiscordBotToken
+DCID=DiscordBotClientID
+DCWH=https://Discord.Private.Webhook.URL
+
+# For local dev keep localhost;
+# For docker-compose set BOT_USE_API_URL=http://api:3000
+# Bot/client-specific API URL (used by /src components to call the API)
+BOT_USE_API_URL=http://localhost:3000
+
+# Bahamut Configuration
+BHUD=BahamutID
+BHPD=BahamutSecret
+
+# For local dev keep localhost;
+# For docker-compose set API_PUBLIC_URL=http://api:3000
+# API server public URL (used by clients to reach the API)
+API_PUBLIC_URL=http://localhost:3000
 
 # API Server Configuration
 API_PORT=3000
-# Public URL for the API (what clients reach)
-API_PUBLIC_URL=http://localhost:3000
-# Bot/client-specific API URL (used by src); falls back to API_PUBLIC_URL when unset
-BOT_USE_API_URL=http://localhost:3000
-# Optional: set to 'true' to bypass IP allowlist when using proxies or tunnels (e.g., Cloudflare Tunnel)
-API_ALLOW_ALL=false
 
-# Environment
+# Support a bypass (useful for tunnels) when set to the literal string 'true'
+API_ALLOW_ALL=true
+
+# Comma-separated list of IPs (exact matches) to allow API access.
+# Example: API_WHITELIST=192.168.1.100,10.0.0.2
+# (leave empty to only allow localhost)
+API_WHITELIST=
+
+# Node Environment (development or production)
 NODE_ENV=development
 ```
-
-### Architecture
-
-The bot operates in **API Mode** using a centralized API server:
-
-- ✅ Better modularity and maintainability
-- ✅ Independent testing and monitoring
-- ✅ Shared service layer across platforms
-- ✅ Professional API documentation interface
-- ✅ Easier to scale and extend
-
-See [API Integration Guide](doc/api-integration-guide.md) for detailed information.
-
-## API Documentation
-
-- 📖 [API Architecture](doc/api-architecture.md) - System design and architecture overview
-- 📚 [API Documentation](doc/api-documentation.md) - Complete API reference
-- 🧪 [API Testing Examples](doc/api-testing-examples.md) - curl and Postman examples
-- 🔗 API testing UI is served at `/` (previously `/api-test`); `/api-test` is redirected to `/` for compatibility.
-- � [API Integration Guide](doc/api-integration-guide.md) - How to use API mode
-- 📋 [Migration Summary](API-MIGRATION-SUMMARY.md) - API migration details
-- ✅ [Completeness Report](API-COMPLETENESS-REPORT.md) - Feature verification
-
-### Example API Usage
-
-```bash
-# Get Twitter post data
-curl http://localhost:3000/api/v1/twitter/1234567890
-
-# Get Pixiv artwork data
-curl http://localhost:3000/api/v1/pixiv/123456789
-
-# Get Plurk post data
-curl http://localhost:3000/api/v1/plurk/abcd1234
-```
-
-**Available Endpoints:**
-- Twitter/X (`/api/v1/twitter/:statusId`)
-- Pixiv (`/api/v1/pixiv/:illustId`)
-- Plurk (`/api/v1/plurk/:plurkId`)
-- Bluesky (`/api/v1/bluesky/:handle/:postId`)
-- 巴哈姆特 (`/api/v1/baha/:postId`)
-- E-Hentai (`/api/v1/eh/:galleryId/:token`)
-- PChome (`/api/v1/pchome/:productId`)
-- Misskey (`/api/v1/misskey/:noteId`)
-- TikTok (`POST /api/v1/tiktok`)
-- Bilibili (`/api/v1/bilibili/:opusId`)
-- Instagram (`/api/v1/instagram/:postId`)
-- Threads (`POST /api/v1/threads`)
-- PTT (`/api/v1/ptt/:board/:postId`)
-- Weibo (`/api/v1/weibo/:statusId`)
-- PChome (`/api/v1/pchome/:productId`)
-- Misskey (`/api/v1/misskey/:noteId`)
-- TikTok (`POST /api/v1/tiktok`)
-- Bilibili (`/api/v1/bilibili/:opusId`)
-
-## Invite BOT
-
-[discord.com/application-directory/1078919650764652594](https://discord.com/application-directory/1078919650764652594)
 
 ## Policies
 
