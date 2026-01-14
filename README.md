@@ -42,7 +42,12 @@ This bot uses **API Mode** to process social media links through a centralized A
 
 1. Configure `.env`:
 ```env
-API_URL=http://localhost:3000
+# API server public URL (for clients)
+API_PUBLIC_URL=http://localhost:3000
+
+# Bot/client API URL (used by src components) - optional (falls back to API_PUBLIC_URL)
+BOT_USE_API_URL=http://localhost:3000
+
 API_PORT=3000
 ```
 
@@ -81,7 +86,10 @@ BHPD="Baha Password (optional)"
 
 # API Server Configuration
 API_PORT=3000
-API_URL=http://localhost:3000
+# Public URL for the API (what clients reach)
+API_PUBLIC_URL=http://localhost:3000
+# Bot/client-specific API URL (used by src); falls back to API_PUBLIC_URL when unset
+BOT_USE_API_URL=http://localhost:3000
 # Optional: set to 'true' to bypass IP allowlist when using proxies or tunnels (e.g., Cloudflare Tunnel)
 API_ALLOW_ALL=false
 

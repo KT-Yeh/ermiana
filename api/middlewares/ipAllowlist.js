@@ -1,6 +1,19 @@
 // IP allowlist middleware
 // Behaviour: only requests from localhost or IPs in API_WHITELIST are allowed.
 
+// Support a bypass (useful for tunnels) when explicitly set to the string 'true'
+const ALLOW_ALL = process.env.API_ALLOW_ALL === 'true';
+
+if (process.env.API_ALLOW_ALL && !ALLOW_ALL) {
+  // Misconfiguration hint: user provided a value other than 'true'
+  console.warn("API_ALLOW_ALL set but not equal to 'true'; only the literal string 'true' enables bypass.");
+}
+
+if (ALLOW_ALL) {
+  // Warning: this bypass is intended for temporary testing behind tunnels/proxies only
+  console.warn('API_ALLOW_ALL is enabled; IP allowlist is bypassed.');
+}
+
 // Localhost IPs
 const LOCALHOST_IPS = ['127.0.0.1', '::1', '::ffff:127.0.0.1'];
 
@@ -11,14 +24,14 @@ const envWhitelist = envWhitelistRaw
   .map((s) => s.trim())
   .filter(Boolean);
 
-// Support a bypass (useful for tunnels) when set to 'true' or '1'
-const ALLOW_ALL = process.env.API_ALLOW_ALL === 'true' || process.env.API_ALLOW_ALL === '1';
-
 // Final allowlist set (includes localhost)
 const ALLOWLIST_IPS = new Set([...LOCALHOST_IPS, ...envWhitelist]);
 
 export function ipAllowlist(req, res, next) {
-  if (ALLOW_ALL) return next();
+  // Prefer a startup-provided flag (set on app) for concise checks
+  const apiAllowAll = req && req.app && typeof req.app.get === 'function' ? req.app.get('apiAllowAll') : (process.env.API_ALLOW_ALL === 'true');
+
+  if (apiAllowAll) return next();
 
   // Prefer headers commonly set by proxies and CDNs
   const headers = req.headers || {};

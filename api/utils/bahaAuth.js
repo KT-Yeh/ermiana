@@ -6,7 +6,7 @@ import { CronJob } from 'cron';
  * 重新載入巴哈姆特登入 Token
  */
 export async function reloadBahaTK() {
-  const { configManager } = await import('../../src/utils/configManager.js');
+  const { configManager } = await import('./configManager.js');
   const config = await configManager();
 
   const headers = {

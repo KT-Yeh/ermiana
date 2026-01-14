@@ -8,6 +8,7 @@ services:
       - .env
     environment:
       API_PORT: ${API_PORT:-3000}
+      API_PUBLIC_URL: ${API_PUBLIC_URL:-http://api:3000}
       NODE_ENV: ${NODE_ENV:-production}
     ports:
       - "3000:3000"
@@ -21,7 +22,7 @@ services:
     env_file:
       - .env
     environment:
-      API_URL: ${API_URL:-http://api:3000}
+      BOT_USE_API_URL: ${BOT_USE_API_URL:-http://api:3000}
       NODE_ENV: ${NODE_ENV:-production}
     depends_on:
       - api

@@ -2,7 +2,7 @@
 
 這個檔案包含了使用 curl 測試 Ermiana API 的範例指令。
 
-**注意**：範例使用 `http://localhost:3000`，請在正式部署時替換為您的 API 網域或設定 `API_URL` 環境變數。
+**注意**：範例使用 `http://localhost:3000`，請在正式部署時替換為您的 API 網域；若需分離內部/外部設定，請使用 `API_PUBLIC_URL`（供對外）與 `BOT_USE_API_URL`（供 bot/client）。
 
 
 ## 前置條件

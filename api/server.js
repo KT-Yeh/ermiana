@@ -3,7 +3,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { configManager } from '../src/utils/configManager.js';
+import dotenv from 'dotenv';
+dotenv.config();
+import { configManager } from './utils/configManager.js';
 import { initializeBahaAuth } from './utils/bahaAuth.js';
 import twitterRouter from './routes/twitterRoutes.js';
 import pixivRouter from './routes/pixivRoutes.js';
@@ -28,6 +30,15 @@ const __dirname = path.dirname(__filename);
 const app = express();
 // Trust proxy so req.ip reflects the original client IP when behind proxies/tunnels (e.g., Cloudflare Tunnel)
 app.set('trust proxy', true);
+
+// Preprocess API-specific env flags (strip quotes, normalize) and expose them on the app
+import { preprocessEnv } from './utils/envPreprocessor.js';
+const flags = preprocessEnv();
+if (flags.API_ALLOW_ALL) {
+  console.warn('API_ALLOW_ALL is enabled; IP allowlist will be bypassed.');
+}
+app.set('apiAllowAll', Boolean(flags.API_ALLOW_ALL));
+
 const config = await configManager();
 const PORT = config.API_PORT || 3000;
 
@@ -53,11 +64,12 @@ app.use(ipAllowlist);
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Serve runtime config to the client (returns JS setting window.__API_BASE_URL__)
-// If API_BASE_URL env var is set, use it; otherwise empty string (client will use relative paths)
+// Use API_BASE_URL (if set) or fallback to API_PUBLIC_URL
 app.get('/config.js', (req, res) => {
-  const raw = process.env.API_BASE_URL || '';
+  const raw = process.env.API_BASE_URL || process.env.API_PUBLIC_URL || '';
   // 只允許空字串或 http/https URL（基本驗證）
-  const safe = (raw === '' || /^https?:\/\/[^\s/]+/.test(raw)) ? raw : '';
+  const isValid = raw === '' || /^https?:\/\/\S+\/?$/.test(raw);
+  const safe = isValid ? raw : '';
   res.type('application/javascript');
   res.set('Cache-Control', 'no-store');
   res.send(`window.__API_BASE_URL__ = ${JSON.stringify(safe)};`);

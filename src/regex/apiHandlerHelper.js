@@ -87,7 +87,7 @@ export async function handleAPIRequest(options) {
   try {
     const apiResp = await axios.request({
       method: 'get',
-      url: `${config.API_URL}${apiPath}`,
+      url: `${config.BOT_USE_API_URL}${apiPath}`,
       timeout: 5000,
     });
 
@@ -147,7 +147,7 @@ export async function handleAPIPostRequest(options) {
   try {
     const apiResp = await axios.request({
       method: 'post',
-      url: `${config.API_URL}${apiPath}`,
+      url: `${config.BOT_USE_API_URL}${apiPath}`,
       data: postData,
       timeout: 5000,
       headers: {
