@@ -59,7 +59,6 @@ export function setupBahaCronJob() {
     'Asia/Taipei',
   );
 
-  console.log('Baha Cronjob set ok!');
   bahaJob.start();
   return bahaJob;
 }
@@ -79,7 +78,6 @@ export function getBahaTokens() {
  * 初始化巴哈認證系統
  */
 export async function initializeBahaAuth() {
-  console.log('Initializing Baha authentication...');
   await reloadBahaTK();
   setupBahaCronJob();
   console.log('Baha authentication initialized');

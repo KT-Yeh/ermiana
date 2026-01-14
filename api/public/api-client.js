@@ -1,6 +1,8 @@
 /* eslint-env browser */
 // API Configuration
-const API_BASE_URL = 'http://localhost:3000';
+// Runtime-configurable API base: server may inject `window.__API_BASE_URL__` via /config.js
+// If not provided, use relative paths (production-safe)
+const API_BASE_URL = (typeof window !== 'undefined' && typeof window.__API_BASE_URL__ !== 'undefined') ? window.__API_BASE_URL__ : '';
 
 // API Endpoints Configuration
 const API_ENDPOINTS = [
@@ -245,7 +247,7 @@ async function checkServerStatus() {
     const response = await fetch(`${API_BASE_URL}/health`);
     if (response.ok) {
       statusIndicator.classList.add('online');
-      statusText.textContent = 'API 運行中';
+      statusText.textContent = 'API 正常';
     } else {
       statusIndicator.classList.add('offline');
       statusText.textContent = 'API 異常';

@@ -11,15 +11,28 @@ const envWhitelist = envWhitelistRaw
   .map((s) => s.trim())
   .filter(Boolean);
 
+// Support a bypass (useful for tunnels) when set to 'true' or '1'
+const ALLOW_ALL = process.env.API_ALLOW_ALL === 'true' || process.env.API_ALLOW_ALL === '1';
+
 // Final allowlist set (includes localhost)
 const ALLOWLIST_IPS = new Set([...LOCALHOST_IPS, ...envWhitelist]);
 
 export function ipAllowlist(req, res, next) {
-  const clientIp = req.ip || (req.connection && req.connection.remoteAddress) || (req.headers && req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0].trim() : undefined);
+  if (ALLOW_ALL) return next();
+
+  // Prefer headers commonly set by proxies and CDNs
+  const headers = req.headers || {};
+  const forwarded = headers['x-forwarded-for'] || headers['cf-connecting-ip'] || headers['x-real-ip'];
+  const clientIpFromHeader = forwarded ? forwarded.split(',')[0].trim() : undefined;
+
+  const clientIp = clientIpFromHeader || req.ip || (req.connection && req.connection.remoteAddress);
 
   if (clientIp && ALLOWLIST_IPS.has(clientIp)) {
     return next();
   }
+
+  // Log for debugging (admin use) but avoid leaking sensitive data in responses
+  console.warn('Forbidden request from IP:', clientIp);
 
   return res.status(403).json({
     success: false,

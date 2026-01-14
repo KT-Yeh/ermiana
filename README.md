@@ -82,6 +82,8 @@ BHPD="Baha Password (optional)"
 # API Server Configuration
 API_PORT=3000
 API_URL=http://localhost:3000
+# Optional: set to 'true' to bypass IP allowlist when using proxies or tunnels (e.g., Cloudflare Tunnel)
+API_ALLOW_ALL=false
 
 # Environment
 NODE_ENV=development
@@ -104,6 +106,7 @@ See [API Integration Guide](doc/api-integration-guide.md) for detailed informati
 - 📖 [API Architecture](doc/api-architecture.md) - System design and architecture overview
 - 📚 [API Documentation](doc/api-documentation.md) - Complete API reference
 - 🧪 [API Testing Examples](doc/api-testing-examples.md) - curl and Postman examples
+- 🔗 API testing UI is served at `/` (previously `/api-test`); `/api-test` is redirected to `/` for compatibility.
 - � [API Integration Guide](doc/api-integration-guide.md) - How to use API mode
 - 📋 [Migration Summary](API-MIGRATION-SUMMARY.md) - API migration details
 - ✅ [Completeness Report](API-COMPLETENESS-REPORT.md) - Feature verification

@@ -26,6 +26,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+// Trust proxy so req.ip reflects the original client IP when behind proxies/tunnels (e.g., Cloudflare Tunnel)
+app.set('trust proxy', true);
 const config = await configManager();
 const PORT = config.API_PORT || 3000;
 
@@ -34,9 +36,11 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
+      // Allow external analytics script from Cloudflare Insights and inline scripts
+      scriptSrc: ["'self'", "'unsafe-inline'", 'https://static.cloudflareinsights.com'],
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", 'data:', 'https:'],
+      connectSrc: ["'self'", 'https:', 'http:'],
     },
   },
 }));
@@ -48,13 +52,24 @@ app.use(ipAllowlist);
 // Serve static files from public directory
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
+// Serve runtime config to the client (returns JS setting window.__API_BASE_URL__)
+// If API_BASE_URL env var is set, use it; otherwise empty string (client will use relative paths)
+app.get('/config.js', (req, res) => {
+  const raw = process.env.API_BASE_URL || '';
+  // 只允許空字串或 http/https URL（基本驗證）
+  const safe = (raw === '' || /^https?:\/\/[^\s/]+/.test(raw)) ? raw : '';
+  res.type('application/javascript');
+  res.set('Cache-Control', 'no-store');
+  res.send(`window.__API_BASE_URL__ = ${JSON.stringify(safe)};`);
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// API Documentation page
-app.get('/api-test', (req, res) => {
+// API Documentation page (serve at root)
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
@@ -102,7 +117,7 @@ app.use(errorHandler);
 
 // Initialize Baha authentication and start server
 app.listen(PORT, async () => {
-  console.log(`API Server running on port ${PORT}`);
+  console.log(`API Server running on http://localhost:${PORT}`);
   // Initialize Baha authentication (login and setup cron job)
   try {
     await initializeBahaAuth();

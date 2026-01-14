@@ -8,7 +8,7 @@
 {
   success: true | false,                // 必填，布林值
   style: "normal" | "more" | "pixiv" | "backup",  // 必填，預設 "normal"
-  color: 0x1DA1F2,                      // 必填，數字 (hex 轉整數)
+  color: 0x1DA1F2,                      // 必填，數字(hex)
   author: {                             // 可選
     text: "作者名稱",
     iconurl: "作者頭像 URL"
@@ -24,6 +24,7 @@
     url: "第一張圖 URL",
     count: 5                          // 總數
   },
+  videoArray: ["影1", "影2"...],      // 可選
   fields: [                           // 可選
     {
       name: "欄位名稱",
@@ -31,7 +32,7 @@
       inline: true | false
     }
   ],
-  footer: {                           // 必填
+  footer: {                           // 可選
     text: "ermiana",                  // 預設值
     iconurl: "https://ermiana.canaria.cc/pic/canaria.png"  // 預設值
   },
