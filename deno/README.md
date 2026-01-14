@@ -1,12 +1,13 @@
 ﻿# /deno 
 
-此資料夾包含以 **TypeScript** 開發、並部署在 **Deno Deploy** 的小工具與範例程式。
+此資料夾包含以 **TypeScript** 開發、並部署在 **Deno Deploy** 的小工具。
 
-## counter.ts  伺服器計數器 
+<a href="https://discord.com/application-directory/1078919650764652594"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fermiana.deno.dev%2F&style=flat-square&logo=Discord&logoColor=white&cacheSeconds=86400"></a>
 
-- **用途**：用於計算與記錄 Discord bot 被加入的伺服器（guild）數量，作為統計與儀表板資料來源。
-- **替代**：此檔案用來替代舊有的 `/workers/ermiana-count.js`（將同步或移轉功能至 Deno 環境）。
-- **技術**：TypeScript + Deno（建議部署至 Deno Deploy）。
+## counter.ts
+
+- **用途**：用於計算與記錄 Discord bot 被加入的伺服器（guild）數量，作為儀表板的資料來源。
+- **替代**：用以替代舊有的 [/workers/ermiana-count.js](../workers/ermiana-count.js) 。
 
 ## 快速上手 
 
@@ -14,29 +15,32 @@
 
 ```bash
 # 例：允許網路與環境變數（依實際需求調整）
-den o run --allow-net --allow-env deno/counter.ts
+deno run --allow-net --allow-env deno/counter.ts
 ```
 
 - Deno Deploy：
-  1. 在 Deno Deploy 建立一個新服務（Project）。
-  2. 指定 `counter.ts` 為入口檔案，並設定必要的環境變數（若有）。
-  3. 部署後會有公開 URL，可用來做 webhook 呼叫或定期 ping。
 
-## API / 使用方式（範例）
+  **Option A — Dashboard（建議）**:
+  1. 在 Deno Deploy 建立一個新 Project，並連結你的 GitHub repository 或上傳檔案。
+  2. 在 Project 設定中將入口檔案設定為 `deno/counter.ts`（或對應路徑），並在 Environment variables 加入必要的變數（例如 API tokens）。
+  3. 點選 Deploy（部署）後會產生公開 URL，可用於 webhook 呼叫或定期 ping。
 
-- counter.ts 會暴露簡單的 HTTP 介面（例如 `/count`、`/ping` 等）以便 Bot 或其他服務呼叫以更新或讀取計數。詳情請參考程式碼註解。
+  **Option B — 使用 deployctl（CLI）**:
+  1. 安裝或以 `deno run` 使用 `deployctl`：
 
 ```bash
-# 範例：讀取計數
-curl https://<your-deno-deploy>.deno.dev/count
+# 安裝（範例）
+deno install -f -n deployctl https://deno.land/x/deploy/deployctl.ts
 ```
 
-## 維運 & 注意事項 
+  2. 從 Deno Deploy 取得 API token（例如設為 `DENO_DEPLOY_TOKEN` 環境變數），並以環境變數或 flag 提供給 `deployctl`。
+  3. 以 `deployctl` 發布：
 
-- 本地測試時請注意授權參數（`--allow-net`, `--allow-env` 等）。
-- 部署後建議監控流量與日誌以確保計數正確。 
-- 若要清理舊版，可在確認功能等效後移除 `/workers/ermiana-count.js`。
+```bash
+# 範例（參考 deployctl 文件調整參數）
+deployctl deploy --project <PROJECT_NAME> deno/counter.ts
+```
 
-## 貢獻或問題回報 
+  4. 部署完成後同樣會得到公開 URL，可供 webhook 或定期 ping 呼叫。
 
-歡迎提出 PR 或 issue。如果需要，我可以幫忙加入更詳細的 API 範例或自動化部署說明。
+  **注意**：Deno Deploy 會自動處理 TypeScript，若程式需要本地檔案或特定權限，請確認部署環境是否支援並調整程式或設定。
