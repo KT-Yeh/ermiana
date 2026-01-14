@@ -47,6 +47,8 @@ function createEmbedFromAPI(data) {
     embed.setImage(data.image);
   } else if (data.style === 'pixiv' && data.imagePixiv) {
     embed.setImage(data.imagePixiv.url);
+  } else if (data.style === 'more' && data.image) {
+    embed.setImage(data.image);
   }
 
   // 添加額外欄位

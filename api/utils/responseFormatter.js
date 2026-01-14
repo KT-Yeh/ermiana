@@ -96,7 +96,8 @@ export function createStandardResponse(options) {
   // 根據 style 添加對應的圖片欄位
   if (style === 'normal' && image) {
     response.image = String(image);
-  } else if (style === 'more' && imageArray) {
+  } else if (style === 'more' && image && imageArray) {
+    response.image = String(image);
     response.imageArray = imageArray.map((url) => String(url));
   } else if (style === 'pixiv' && imagePixiv) {
     response.imagePixiv = {
