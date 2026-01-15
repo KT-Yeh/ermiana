@@ -3,15 +3,15 @@ import { createStandardResponse, createErrorResponse } from '../utils/responseFo
 
 export class TiktokService {
   static async getVideoData(videoUrl) {
-    let proxyUrl = videoUrl.replace(/tiktok\.com/, 'tnktok.com');
-    
+    let proxyUrl = videoUrl;
+
     // Try tnktok.com first
     try {
       const tnktokUrl = videoUrl.replace(/tiktok\.com/, 'tnktok.com');
       const response = await axios.request({
-        url: tnktokUrl,
+        url: 'https://offload.tnktok.com/',
         method: 'get',
-        timeout: 3000,
+        timeout: 1500,
       });
 
       if (response.status === 200) {
@@ -19,23 +19,23 @@ export class TiktokService {
       } else {
         throw new Error('tnktok failed');
       }
-    } catch (tnktokError) {
+    } catch {
       // Try tiktokez.com as backup
       try {
-        const tiktokezUrl = videoUrl.replace(/tiktok\.com/, 'tiktokez.com');
+        const tiktxkUrl = videoUrl.replace(/tiktok\.com/, 'tiktxk.com');
         const response = await axios.request({
-          url: tiktokezUrl,
+          url: 'https://tiktxk.com/crab',
           method: 'get',
-          timeout: 3000,
+          timeout: 1500,
         });
 
         if (response.status === 200) {
-          proxyUrl = tiktokezUrl;
+          proxyUrl = tiktxkUrl;
         } else {
-          throw new Error('tiktokez failed');
+          throw new Error('tiktxk failed');
         }
-      } catch (tiktokezError) {
-        console.error('TikTok API Error (both proxies failed):', tiktokezError.message);
+      } catch {
+        console.error('TikTok API Error (both proxies failed):' + videoUrl);
         // Use default tnktok URL
         proxyUrl = videoUrl.replace(/tiktok\.com/, 'tnktok.com');
       }
