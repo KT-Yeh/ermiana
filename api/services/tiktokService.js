@@ -2,7 +2,7 @@ import axios from 'axios';
 import { createStandardResponse, createErrorResponse } from '../utils/responseFormatter.js';
 
 export class TiktokService {
-  static async getVideoData(videoUrl) {
+  static async getTiktokData(videoUrl) {
     let proxyUrl = videoUrl;
 
     // Try tnktok.com first
@@ -17,11 +17,7 @@ export class TiktokService {
       if (response.status === 200) {
         proxyUrl = tnktokUrl;
       } else {
-        throw new Error('tnktok failed');
-      }
-    } catch {
-      // Try tiktokez.com as backup
-      try {
+        // Try tiktxk.com as backup
         const tiktxkUrl = videoUrl.replace(/tiktok\.com/, 'tiktxk.com');
         const response = await axios.request({
           url: 'https://tiktxk.com/crab',
@@ -32,13 +28,17 @@ export class TiktokService {
         if (response.status === 200) {
           proxyUrl = tiktxkUrl;
         } else {
-          throw new Error('tiktxk failed');
+          return createErrorResponse('TikTok API Error: Unable to reach proxy services.');
         }
-      } catch {
-        console.error('TikTok API Error (both proxies failed):' + videoUrl);
-        // Use default tnktok URL
-        proxyUrl = videoUrl.replace(/tiktok\.com/, 'tnktok.com');
       }
+    } catch {
+      // Use default tnktok URL
+      console.error('TikTok API Error (both proxies failed):' + videoUrl);
+      proxyUrl = videoUrl.replace(/tiktok\.com/, 'tnktok.com');
+    }
+
+    if (proxyUrl === videoUrl) {
+      return createErrorResponse('TikTok API Error: Unable to reach proxy services.');
     }
 
     return createStandardResponse({
@@ -48,10 +48,6 @@ export class TiktokService {
       name: {
         title: 'TikTok',
         url: videoUrl,
-      },
-      footer: {
-        text: 'ermiana',
-        iconurl: 'https://ermiana.canaria.cc/pic/tiktok.png',
       },
       rollback: proxyUrl,
     });

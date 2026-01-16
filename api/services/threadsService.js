@@ -1,9 +1,33 @@
-import { createStandardResponse } from '../utils/responseFormatter.js';
+import axios from 'axios';
+import { createStandardResponse, createErrorResponse } from '../utils/responseFormatter.js';
 
-export async function getThreadsData(url) {
-  try {
-    // Threads uses fixthreads.net as proxy
-    const fixedUrl = url.replace(/threads\.net/, 'fixthreads.net');
+export class ThreadsService {
+  static async getThreadsData(videoUrl) {
+    let proxyUrl = videoUrl;
+
+    // Try fixthreads.net
+    try {
+      const fixedUrl = videoUrl.replace(/threads\.com/, 'fixthreads.net');
+      const response = await axios.request({
+        url: 'https://fixthreads.net/health',
+        method: 'get',
+        timeout: 1500,
+      });
+
+      if (response.status === 200) {
+        proxyUrl = fixedUrl;
+      } else {
+        return createErrorResponse('Threads API Error: Unable to reach proxy services.');
+      }
+    } catch {
+      // Use default fixthreads URL
+      console.error('Threads API Error: ' + videoUrl);
+      proxyUrl = videoUrl.replace(/threads\.com/, 'fixthreads.net');
+    }
+
+    if (proxyUrl === videoUrl) {
+      return createErrorResponse('Threads API Error: Unable to reach proxy services.');
+    }
 
     return createStandardResponse({
       success: true,
@@ -11,28 +35,9 @@ export async function getThreadsData(url) {
       color: '0x000000',
       name: {
         title: 'Threads',
-        url: url,
+        url: videoUrl,
       },
-      footer: {
-        text: 'ermiana',
-        iconurl: 'https://ermiana.canaria.cc/pic/threads.png',
-      },
-      rollback: fixedUrl,
-    });
-  } catch (error) {
-    return createStandardResponse({
-      success: true,
-      style: 'backup',
-      color: '0x000000',
-      name: {
-        title: 'Threads',
-        url: url,
-      },
-      footer: {
-        text: 'ermiana',
-        iconurl: 'https://ermiana.canaria.cc/pic/threads.png',
-      },
-      rollback: url,
+      rollback: proxyUrl,
     });
   }
 }

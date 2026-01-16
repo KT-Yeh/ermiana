@@ -1,22 +1,29 @@
 import express from 'express';
-import { getThreadsData } from '../services/threadsService.js';
+import { ThreadsService } from '../services/threadsService.js';
 
 const router = express.Router();
 
+/**
+ * GET /api/v1/threads?url=xxx
+ * Get Threads video data
+ * Query: { url: string }
+ */
 router.get('/', async (req, res, next) => {
   try {
     const { url } = req.query;
 
-    if (!url) {
+    if (!url || !url.includes('threads.com')) {
       return res.status(400).json({
         success: false,
-        error: 'URL is required',
+        error: {
+          message: 'Invalid Threads URL',
+          code: 'INVALID_PARAMETER',
+        },
       });
     }
 
-    const data = await getThreadsData(url);
-
-    res.json(data);
+    const result = await ThreadsService.getThreadsData(url);
+    res.json(result);
   } catch (error) {
     next(error);
   }

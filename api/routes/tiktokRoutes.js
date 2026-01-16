@@ -22,7 +22,7 @@ router.get('/', async (req, res, next) => {
       });
     }
 
-    const result = await TiktokService.getVideoData(url);
+    const result = await TiktokService.getTiktokData(url);
     res.json(result);
   } catch (error) {
     next(error);
