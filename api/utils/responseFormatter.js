@@ -41,10 +41,7 @@ export function createStandardResponse(options) {
     imageArray = null,
     imagePixiv = null,
     fields = null,
-    footer = {
-      text: 'ermiana',
-      iconurl: 'https://ermiana.canaria.cc/pic/canaria.png',
-    },
+    footer = null,
     rollback = null,
     timestamp = null,
   } = options;
@@ -62,9 +59,6 @@ export function createStandardResponse(options) {
   if (!name || !name.title || !name.url) {
     throw new Error('name with title and url is required');
   }
-  if (!footer || !footer.text || !footer.iconurl) {
-    throw new Error('footer with text and iconurl is required');
-  }
 
   // 建立基本回應
   const response = {
@@ -74,10 +68,6 @@ export function createStandardResponse(options) {
     name: {
       title: String(name.title),
       url: String(name.url),
-    },
-    footer: {
-      text: String(footer.text),
-      iconurl: String(footer.iconurl),
     },
   };
 
@@ -112,6 +102,13 @@ export function createStandardResponse(options) {
       value: String(field.value),
       inline: Boolean(field.inline),
     }));
+  }
+
+  if (footer) {
+    response.footer = {
+      text: String(footer.text),
+      iconurl: String(footer.iconurl),
+    };
   }
 
   if (rollback) {
