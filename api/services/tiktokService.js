@@ -19,13 +19,13 @@ export class TiktokService {
       } else {
         // Try tiktxk.com as backup
         const tiktxkUrl = videoUrl.replace(/tiktok\.com/, 'tiktxk.com');
-        const response = await axios.request({
+        const response2 = await axios.request({
           url: 'https://tiktxk.com/crab',
           method: 'get',
           timeout: 1500,
         });
 
-        if (response.status === 200) {
+        if (response2.status === 200) {
           proxyUrl = tiktxkUrl;
         } else {
           return createErrorResponse('TikTok API Error: Unable to reach proxy services.');

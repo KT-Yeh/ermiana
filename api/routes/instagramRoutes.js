@@ -1,8 +1,13 @@
 import express from 'express';
-import { getInstagramData } from '../services/instagramService.js';
+import { InstagramService } from '../services/instagramService.js';
 
 const router = express.Router();
 
+/**
+ * GET /api/v1/instagram/:postId
+ * Get Instagram post data
+ * Params: { postId: string }
+ */
 router.get('/:postId', async (req, res, next) => {
   try {
     const { postId } = req.params;
@@ -10,23 +15,15 @@ router.get('/:postId', async (req, res, next) => {
     if (!postId) {
       return res.status(400).json({
         success: false,
-        error: 'Post ID is required',
+        error: {
+          message: 'Invalid Instagram URL',
+          code: 'Post ID is required',
+        },
       });
     }
 
-    const data = await getInstagramData(postId);
-
-    if (data.error) {
-      return res.status(200).json({
-        success: true,
-        data,
-      });
-    }
-
-    res.json({
-      success: true,
-      data,
-    });
+    const result = await InstagramService.getInstagramData(postId);
+    res.json(result);
   } catch (error) {
     next(error);
   }

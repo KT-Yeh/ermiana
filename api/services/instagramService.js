@@ -1,52 +1,50 @@
 import axios from 'axios';
-import { createStandardResponse } from '../utils/responseFormatter.js';
+import { createStandardResponse, createErrorResponse } from '../utils/responseFormatter.js';
 
-export async function getInstagramData(postId) {
-  let proxyUrl = `https://www.ddinstagram.com/p/${postId}/`;
+export class InstagramService {
+  static async getInstagramData(postId) {
+    let proxyUrl = `https://www.fxstagram.com/p/${postId}/`;
 
-  try {
-    // Try ddinstagram first
-    const ddResp = await axios.request({
-      url: 'https://www.ddinstagram.com/',
-      method: 'get',
-      timeout: 4400,
-    });
-
-    if (ddResp.status === 200) {
-      proxyUrl = `https://www.ddinstagram.com/p/${postId}/`;
-    } else {
-      throw new Error('ddinstagram not available');
-    }
-  } catch (error) {
-    // Fallback to instagramez
+    // Try fxstagram first
     try {
-      const ezResp = await axios.request({
-        url: `https://www.instagramez.com/p/${postId}/`,
+      const fxstagramUrl = `https://www.fxstagram.com/p/${postId}/`;
+      const response = await axios.request({
+        url: 'https://www.fxstagram.com/',
         method: 'get',
-        timeout: 2500,
+        timeout: 1500,
       });
 
-      if (ezResp.status === 200) {
-        proxyUrl = `https://www.instagramez.com/p/${postId}/`;
-      }
-    } catch (fallbackError) {
-      // Use default ddinstagram URL
-      proxyUrl = `https://www.ddinstagram.com/p/${postId}/`;
-    }
-  }
+      if (response.status === 200) {
+        proxyUrl = fxstagramUrl;
+      } else {
+        // Try zzinstagram as backup
+        const zzinstagramUrl = `https://www.zzinstagram.com/p/${postId}/`;
+        const response2 = await axios.request({
+          url: 'https://www.zzinstagram.com/',
+          method: 'get',
+          timeout: 1500,
+        });
 
-  return createStandardResponse({
-    success: true,
-    style: 'backup',
-    color: '0xE4405F',
-    name: {
-      title: 'Instagram',
-      url: `https://www.instagram.com/p/${postId}/`,
-    },
-    footer: {
-      text: 'ermiana',
-      iconurl: 'https://ermiana.canaria.cc/pic/instagram.png',
-    },
-    rollback: proxyUrl,
-  });
+        if (response2.status === 200) {
+          proxyUrl = zzinstagramUrl;
+        } else {
+          return createErrorResponse('Instagram API Error: Unable to reach proxy services.');
+        }
+      }
+    } catch {
+    // Use default fxstagram URL
+      proxyUrl = `https://www.fxstagram.com/p/${postId}/`;
+    }
+
+    return createStandardResponse({
+      success: true,
+      style: 'backup',
+      color: '0xE4405F',
+      name: {
+        title: 'Instagram',
+        url: `https://www.instagram.com/p/${postId}/`,
+      },
+      rollback: proxyUrl,
+    });
+  }
 }
