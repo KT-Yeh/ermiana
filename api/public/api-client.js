@@ -59,49 +59,18 @@ const API_ENDPOINTS = [
     buildUrl: (params) => `/api/v1/plurk/${params.plurkId}`,
   },
   {
-    id: 'bluesky',
-    name: 'Bluesky',
+    id: 'baha',
+    name: '巴哈姆特',
     method: 'GET',
-    path: '/api/v1/bluesky/:handle/:postId',
+    path: '/api/v1/baha/:postId',
     examples: [
-      'https://bsky.app/profile/asagi0398.bsky.social/post/3mcb3ny2jxk2b',
-      'https://bsky.app/profile/asagi0398.bsky.social/post/3mcb3qmmeus2b',
-      'https://bsky.app/profile/asagi0398.bsky.social/post/3mbjengg4ts2s',
-      'https://bsky.app/profile/milkshakework.bsky.social/post/3mbg3z4by4s27',
+      'https://forum.gamer.com.tw/C.php?bsn=60076&snA=8993965',
+      'https://forum.gamer.com.tw/C.php?bsn=60076&snA=8187231',
     ],
     parameters: [
-      { name: 'handle', label: 'Handle', type: 'text', required: true, placeholder: 'bsky.app' },
-      { name: 'postId', label: 'Post ID', type: 'text', required: true, placeholder: '3lbfb7aq2ds2u' },
+      { name: 'postId', label: 'Post ID', type: 'text', required: true, placeholder: 'C.php?bsn=60076&snA=123456' },
     ],
-    buildUrl: (params) => `/api/v1/bluesky/${params.handle}/${params.postId}`,
-  },
-  {
-    id: 'tiktok',
-    name: 'TikTok',
-    method: 'GET',
-    path: '/api/v1/tiktok?url=xxx',
-    examples: [
-      'https://www.tiktok.com/@tuknekona/video/7569193652854066452',
-      'https://www.tiktok.com/@tuknekona/video/7568128141491817748',
-    ],
-    parameters: [
-      { name: 'url', label: 'TikTok URL', type: 'text', required: true, placeholder: 'https://www.tiktok.com/@username/video/1234567890123456789' },
-    ],
-    buildUrl: (params) => `/api/v1/tiktok?url=${encodeURIComponent(params.url)}`,
-  },
-  {
-    id: 'bilibili',
-    name: 'Bilibili',
-    method: 'GET',
-    path: '/api/v1/bilibili/:opusId',
-    examples: [
-      'https://www.bilibili.com/opus/1031137638211387398',
-      'https://www.bilibili.com/opus/1110569897275949064',
-    ],
-    parameters: [
-      { name: 'opusId', label: 'Opus ID', type: 'text', required: true, placeholder: '1087896863688556544' },
-    ],
-    buildUrl: (params) => `/api/v1/bilibili/${params.opusId}`,
+    buildUrl: (params) => `/api/v1/baha/${params.postId}`,
   },
   {
     id: 'eh',
@@ -134,18 +103,36 @@ const API_ENDPOINTS = [
     buildUrl: (params) => `/api/v1/pchome/${params.productId}`,
   },
   {
-    id: 'baha',
-    name: '巴哈姆特',
+    id: 'ptt',
+    name: 'PTT',
     method: 'GET',
-    path: '/api/v1/baha/:postId',
+    path: '/api/v1/ptt/:board/:postId',
     examples: [
-      'https://forum.gamer.com.tw/C.php?bsn=60076&snA=8993965',
-      'https://forum.gamer.com.tw/C.php?bsn=60076&snA=8187231',
+      'https://www.ptt.cc/bbs/C_Chat/M.1767604234.A.400.html',
+      'https://www.ptt.cc/bbs/Gossiping/M.1768278783.A.336.html',
     ],
     parameters: [
-      { name: 'postId', label: 'Post ID', type: 'text', required: true, placeholder: 'C.php?bsn=60076&snA=123456' },
+      { name: 'board', label: 'Board', type: 'text', required: true, placeholder: 'Gossiping' },
+      { name: 'postId', label: 'Post ID', type: 'text', required: true, placeholder: 'M.1234567890.A.123' },
     ],
-    buildUrl: (params) => `/api/v1/baha/${params.postId}`,
+    buildUrl: (params) => `/api/v1/ptt/${params.board}/${params.postId}`,
+  },
+  {
+    id: 'bluesky',
+    name: 'Bluesky',
+    method: 'GET',
+    path: '/api/v1/bluesky/:handle/:postId',
+    examples: [
+      'https://bsky.app/profile/asagi0398.bsky.social/post/3mcb3ny2jxk2b',
+      'https://bsky.app/profile/asagi0398.bsky.social/post/3mcb3qmmeus2b',
+      'https://bsky.app/profile/asagi0398.bsky.social/post/3mbjengg4ts2s',
+      'https://bsky.app/profile/milkshakework.bsky.social/post/3mbg3z4by4s27',
+    ],
+    parameters: [
+      { name: 'handle', label: 'Handle', type: 'text', required: true, placeholder: 'bsky.app' },
+      { name: 'postId', label: 'Post ID', type: 'text', required: true, placeholder: '3lbfb7aq2ds2u' },
+    ],
+    buildUrl: (params) => `/api/v1/bluesky/${params.handle}/${params.postId}`,
   },
   {
     id: 'misskey',
@@ -161,6 +148,20 @@ const API_ENDPOINTS = [
       { name: 'noteId', label: 'Note ID', type: 'text', required: true, placeholder: 'abc123xyz' },
     ],
     buildUrl: (params) => `/api/v1/misskey/${params.host}/${params.noteId}`,
+  },
+  {
+    id: 'tiktok',
+    name: 'TikTok',
+    method: 'GET',
+    path: '/api/v1/tiktok?url=xxx',
+    examples: [
+      'https://www.tiktok.com/@tuknekona/video/7569193652854066452',
+      'https://www.tiktok.com/@tuknekona/video/7568128141491817748',
+    ],
+    parameters: [
+      { name: 'url', label: 'TikTok URL', type: 'text', required: true, placeholder: 'https://www.tiktok.com/@username/video/1234567890123456789' },
+    ],
+    buildUrl: (params) => `/api/v1/tiktok?url=${encodeURIComponent(params.url)}`,
   },
   {
     id: 'instagram',
@@ -193,19 +194,18 @@ const API_ENDPOINTS = [
     buildUrl: (params) => `/api/v1/threads?url=${encodeURIComponent(params.url)}`,
   },
   {
-    id: 'ptt',
-    name: 'PTT',
+    id: 'bilibili',
+    name: 'Bilibili',
     method: 'GET',
-    path: '/api/v1/ptt/:board/:postId',
+    path: '/api/v1/bilibili/:opusId',
     examples: [
-      'https://www.ptt.cc/bbs/C_Chat/M.1767604234.A.400.html',
-      'https://www.ptt.cc/bbs/Gossiping/M.1768278783.A.336.html',
+      'https://www.bilibili.com/opus/1031137638211387398',
+      'https://www.bilibili.com/opus/1110569897275949064',
     ],
     parameters: [
-      { name: 'board', label: 'Board', type: 'text', required: true, placeholder: 'Gossiping' },
-      { name: 'postId', label: 'Post ID', type: 'text', required: true, placeholder: 'M.1234567890.A.123' },
+      { name: 'opusId', label: 'Opus ID', type: 'text', required: true, placeholder: '1087896863688556544' },
     ],
-    buildUrl: (params) => `/api/v1/ptt/${params.board}/${params.postId}`,
+    buildUrl: (params) => `/api/v1/bilibili/${params.opusId}`,
   },
   {
     id: 'weibo',
@@ -268,6 +268,32 @@ function renderEndpoints() {
   });
 }
 
+function renderParamInput(param, endpointId) {
+  const id = `${endpointId}-${param.name}`;
+  const requiredAttr = param.required ? 'required' : '';
+  const requiredMark = param.required ? '<span class="required">*</span>' : '';
+  if (param.type === 'textarea') {
+    return `
+      <div class="form-group">
+        <label class="form-label" for="${id}">
+          ${param.label}
+          ${requiredMark}
+        </label>
+        <textarea id="${id}" class="form-textarea" name="${param.name}" placeholder="${param.placeholder}" ${requiredAttr}></textarea>
+      </div>
+    `;
+  }
+  return `
+    <div class="form-group">
+      <label class="form-label" for="${id}">
+        ${param.label}
+        ${requiredMark}
+      </label>
+      <input id="${id}" type="text" class="form-input" name="${param.name}" placeholder="${param.placeholder}" ${requiredAttr}>
+    </div>
+  `;
+}
+
 // Create Endpoint Card
 function createEndpointCard(endpoint) {
   const card = document.createElement('div');
@@ -301,23 +327,13 @@ function createEndpointCard(endpoint) {
     </div>
   `;
 
-  // Parameters Form
+  // Parameters Form (robust + accessible)
+  const parameters = endpoint.parameters || [];
   const formHtml = `
     <div class="section">
       <div class="section-header">參數</div>
       <form class="test-form" data-endpoint-id="${endpoint.id}">
-        ${endpoint.parameters.map((param) => `
-          <div class="form-group">
-            <label class="form-label">
-              ${param.label}
-              ${param.required ? '<span class="required">*</span>' : ''}
-            </label>
-            ${param.type === 'textarea' ?
-    `<textarea class="form-textarea" name="${param.name}" placeholder="${param.placeholder}" ${param.required ? 'required' : ''}></textarea>` :
-    `<input type="text" class="form-input" name="${param.name}" placeholder="${param.placeholder}" ${param.required ? 'required' : ''}>`
-}
-          </div>
-        `).join('')}
+        ${parameters.map((param) => renderParamInput(param, endpoint.id)).join('')}
         <div class="button-group">
           <button type="submit" class="btn btn-primary">
             <span class="btn-text">測試 API</span>
@@ -375,8 +391,9 @@ async function handleFormSubmit(event, endpoint) {
     params[key] = value.trim();
   }
 
-  // Validate
-  if (endpoint.parameters.some((p) => p.required && !params[p.name])) {
+  // Validate (handle missing parameters safely)
+  const parameters = endpoint.parameters || [];
+  if (parameters.some((p) => p.required && !params[p.name])) {
     alert('請填寫所有必填欄位');
     return;
   }
@@ -398,7 +415,13 @@ async function handleFormSubmit(event, endpoint) {
       body: body ? JSON.stringify(body) : null,
     });
 
-    const data = await response.json();
+    let data;
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      data = await response.text();
+    }
     const time = Date.now() - startTime;
 
     displayResponse(endpoint.id, response.ok, data, time);
@@ -427,7 +450,7 @@ function displayResponse(endpointId, success, data, time) {
 
   timeEl.textContent = `⏱ ${time}ms`;
 
-  bodyEl.textContent = JSON.stringify(data, null, 2);
+  bodyEl.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
 }
 
 // Clear Response
