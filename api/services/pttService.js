@@ -2,11 +2,6 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { createStandardResponse } from '../utils/responseFormatter.js';
 
-const supportedBoards = [
-  'Gossiping', 'C_Chat', 'AC_In', 'H-GAME', 'sex',
-  'HatePolitics', 'Beauty', 'japanavgirls', 'DMM_GAMES',
-];
-
 function boardNameStandardization(boardName) {
   const boardNameStandardized = boardName.toLowerCase();
   const boardMap = {
@@ -22,6 +17,11 @@ function boardNameStandardization(boardName) {
   };
   return boardMap[boardNameStandardized] || boardName;
 }
+
+const supportedBoards = [
+  'Gossiping', 'C_Chat', 'AC_In', 'H-GAME', 'sex',
+  'HatePolitics', 'Beauty', 'japanavgirls', 'DMM_GAMES',
+];
 
 function getPictures(text) {
   const pattern = /https:\/\/.*\.(jpg|jpeg|png|gif|webp)/;
@@ -42,122 +42,39 @@ function getDescription(text) {
   return newsContent.replace(/^※.*$/gm, '').replace(/^\s*[\r\n]/gm, '').substring(0, 160);
 }
 
-export async function getPttData(board, postId) {
-  const standardizedBoard = boardNameStandardization(board);
+export class PttService {
+  static async getPttData(board, postId) {
+    const standardizedBoard = boardNameStandardization(board);
 
-  if (!supportedBoards.includes(standardizedBoard)) {
-    return createStandardResponse({
-      success: true,
-      style: 'backup',
-      color: '0x013370',
-      name: {
-        title: 'PTT',
-        url: `https://www.ptt.cc/bbs/${standardizedBoard}/${postId}.html`,
-      },
-      footer: {
-        text: 'ermiana',
-        iconurl: 'https://ermiana.canaria.cc/pic/ptt.png',
-      },
-      rollback: `https://www.pttweb.cc/bbs/${standardizedBoard}/${postId}`,
-    });
-  }
-
-  try {
-    // Try primary PTT source
-    const pttHTML = await axios.request({
-      url: `https://www.ptt.cc/bbs/${standardizedBoard}/${postId}.html`,
-      method: 'get',
-      headers: {
-        'Host': 'www.ptt.cc',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:137.0) Gecko/20100101 Firefox/137.0',
-        'Accept': 'text/html',
-        'Cookie': 'over18=1;',
-      },
-      timeout: 2000,
-    });
-
-    if (pttHTML.status === 200) {
-      const $ = cheerio.load(pttHTML.data);
-      const title = $('meta[property=og:title]').attr('content') || 'PTT.cc';
-      const description = $('meta[property=og:description]').attr('content') || '';
-      const mainContent = $('#main-content').text().substring(0, 1000) || '';
-
-      let image = '';
-      let enhancedDescription = description;
-
-      // Try to get enhanced data from moptt
-      try {
-        const mopttResp = await axios.request({
-          method: 'get',
-          url: `https://moptt.tw/ptt/${standardizedBoard}.${postId}`,
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:137.0) Gecko/20100101 Firefox/137.0',
-          },
-          timeout: 2000,
-        });
-
-        if (mopttResp.status === 200 && mopttResp.data) {
-          if (mopttResp.data.imageSource) {
-            image = mopttResp.data.imageSource;
-          }
-          if (mopttResp.data.description) {
-            enhancedDescription = mopttResp.data.description;
-          }
-        }
-      } catch (mopttError) {
-        // Use content from main PTT if moptt fails
-        if (mainContent) {
-          const contentPic = getMainContent(mainContent);
-          if (contentPic) {
-            image = contentPic;
-          }
-        }
-      }
-
-      // Parse description for news articles
-      if (description.match(/1\.媒體來源:/)) {
-        const newsDesc = getDescription(mainContent);
-        if (newsDesc) {
-          enhancedDescription = newsDesc;
-        }
-      }
-
+    if (!supportedBoards.includes(standardizedBoard)) {
       return createStandardResponse({
         success: true,
-        style: 'normal',
+        style: 'backup',
         color: '0x013370',
         name: {
-          title: title,
+          title: 'PTT',
           url: `https://www.ptt.cc/bbs/${standardizedBoard}/${postId}.html`,
         },
-        description: enhancedDescription,
-        image: image || null,
-        footer: {
-          text: 'ermiana',
-          iconurl: 'https://ermiana.canaria.cc/pic/ptt.png',
-        },
+        rollback: `https://www.pttweb.cc/bbs/${standardizedBoard}/${postId}`,
       });
     }
 
-    throw new Error('Primary PTT source failed');
-  } catch (error) {
-    // Try backup PTT source
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1800));
-
-      const pttHTML2 = await axios.request({
-        url: `https://ptt-demo.canaria.cc/bbs/${standardizedBoard}/${postId}.html`,
+    // Try primary PTT source
+      const pttHTML = await axios.request({
+        url: `https://www.ptt.cc/bbs/${standardizedBoard}/${postId}.html`,
         method: 'get',
         headers: {
           'Host': 'www.ptt.cc',
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:137.0) Gecko/20100101 Firefox/137.0',
+          'Accept': 'text/html',
           'Cookie': 'over18=1;',
         },
-        timeout: 3000,
+        timeout: 2000,
       });
 
-      if (pttHTML2.status === 200) {
-        const $ = cheerio.load(pttHTML2.data);
+      if (pttHTML.status === 200) {
+        const $ = cheerio.load(pttHTML.data);
         const title = $('meta[property=og:title]').attr('content') || 'PTT.cc';
         const description = $('meta[property=og:description]').attr('content') || '';
         const mainContent = $('#main-content').text().substring(0, 1000) || '';
@@ -165,23 +82,27 @@ export async function getPttData(board, postId) {
         let image = '';
         let enhancedDescription = description;
 
-        // Try moptt again
+        // Try to get enhanced data from moptt
         try {
-          const mopttResp2 = await axios.request({
+          const mopttResp = await axios.request({
             method: 'get',
             url: `https://moptt.tw/ptt/${standardizedBoard}.${postId}`,
-            timeout: 3000,
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:137.0) Gecko/20100101 Firefox/137.0',
+            },
+            timeout: 2000,
           });
 
-          if (mopttResp2.status === 200 && mopttResp2.data) {
-            if (mopttResp2.data.imageSource) {
-              image = mopttResp2.data.imageSource;
+          if (mopttResp.status === 200 && mopttResp.data) {
+            if (mopttResp.data.imageSource) {
+              image = mopttResp.data.imageSource;
             }
-            if (mopttResp2.data.description) {
-              enhancedDescription = mopttResp2.data.description;
+            if (mopttResp.data.description) {
+              enhancedDescription = mopttResp.data.description;
             }
           }
-        } catch {
+        } catch (mopttError) {
+        // Use content from main PTT if moptt fails
           if (mainContent) {
             const contentPic = getMainContent(mainContent);
             if (contentPic) {
@@ -190,6 +111,7 @@ export async function getPttData(board, postId) {
           }
         }
 
+        // Parse description for news articles
         if (description.match(/1\.媒體來源:/)) {
           const newsDesc = getDescription(mainContent);
           if (newsDesc) {
@@ -214,22 +136,98 @@ export async function getPttData(board, postId) {
         });
       }
 
-      throw new Error('Backup PTT source failed');
-    } catch (backupError) {
-      return createStandardResponse({
-        success: true,
-        style: 'backup',
-        color: '0x013370',
-        name: {
-          title: 'PTT',
-          url: `https://www.ptt.cc/bbs/${standardizedBoard}/${postId}.html`,
-        },
-        footer: {
-          text: 'ermiana',
-          iconurl: 'https://ermiana.canaria.cc/pic/ptt.png',
-        },
-        rollback: `https://www.pttweb.cc/bbs/${standardizedBoard}/${postId}`,
-      });
+      throw new Error('Primary PTT source failed');
+    } catch (error) {
+    // Try backup PTT source
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 1800));
+
+        const pttHTML2 = await axios.request({
+          url: `https://ptt-demo.canaria.cc/bbs/${standardizedBoard}/${postId}.html`,
+          method: 'get',
+          headers: {
+            'Host': 'www.ptt.cc',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:137.0) Gecko/20100101 Firefox/137.0',
+            'Cookie': 'over18=1;',
+          },
+          timeout: 3000,
+        });
+
+        if (pttHTML2.status === 200) {
+          const $ = cheerio.load(pttHTML2.data);
+          const title = $('meta[property=og:title]').attr('content') || 'PTT.cc';
+          const description = $('meta[property=og:description]').attr('content') || '';
+          const mainContent = $('#main-content').text().substring(0, 1000) || '';
+
+          let image = '';
+          let enhancedDescription = description;
+
+          // Try moptt again
+          try {
+            const mopttResp2 = await axios.request({
+              method: 'get',
+              url: `https://moptt.tw/ptt/${standardizedBoard}.${postId}`,
+              timeout: 3000,
+            });
+
+            if (mopttResp2.status === 200 && mopttResp2.data) {
+              if (mopttResp2.data.imageSource) {
+                image = mopttResp2.data.imageSource;
+              }
+              if (mopttResp2.data.description) {
+                enhancedDescription = mopttResp2.data.description;
+              }
+            }
+          } catch {
+            if (mainContent) {
+              const contentPic = getMainContent(mainContent);
+              if (contentPic) {
+                image = contentPic;
+              }
+            }
+          }
+
+          if (description.match(/1\.媒體來源:/)) {
+            const newsDesc = getDescription(mainContent);
+            if (newsDesc) {
+              enhancedDescription = newsDesc;
+            }
+          }
+
+          return createStandardResponse({
+            success: true,
+            style: 'normal',
+            color: '0x013370',
+            name: {
+              title: title,
+              url: `https://www.ptt.cc/bbs/${standardizedBoard}/${postId}.html`,
+            },
+            description: enhancedDescription,
+            image: image || null,
+            footer: {
+              text: 'ermiana',
+              iconurl: 'https://ermiana.canaria.cc/pic/ptt.png',
+            },
+          });
+        }
+
+        throw new Error('Backup PTT source failed');
+      } catch (backupError) {
+        return createStandardResponse({
+          success: true,
+          style: 'backup',
+          color: '0x013370',
+          name: {
+            title: 'PTT',
+            url: `https://www.ptt.cc/bbs/${standardizedBoard}/${postId}.html`,
+          },
+          footer: {
+            text: 'ermiana',
+            iconurl: 'https://ermiana.canaria.cc/pic/ptt.png',
+          },
+          rollback: `https://www.pttweb.cc/bbs/${standardizedBoard}/${postId}`,
+        });
+      }
     }
   }
 }

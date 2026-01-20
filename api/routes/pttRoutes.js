@@ -1,8 +1,13 @@
 import express from 'express';
-import { getPttData } from '../services/pttService.js';
+import { PttService } from '../services/pttService.js';
 
 const router = express.Router();
 
+/**
+ * GET /api/v1/ptt/:board/:postId
+ * Get PTT post data
+ * Params: { board: string, postId: string }
+ */
 router.get('/:board/:postId', async (req, res, next) => {
   try {
     const { board, postId } = req.params;
@@ -10,23 +15,15 @@ router.get('/:board/:postId', async (req, res, next) => {
     if (!board || !postId) {
       return res.status(400).json({
         success: false,
-        error: 'Board and post ID are required',
+        error: {
+          message: 'Invalid PTT URL',
+          code: 'Board and post ID are required',
+        },
       });
     }
 
-    const data = await getPttData(board, postId);
-
-    if (data.error) {
-      return res.status(200).json({
-        success: true,
-        data,
-      });
-    }
-
-    res.json({
-      success: true,
-      data,
-    });
+    const result = await PttService.getPttData(board, postId);
+    res.json(result);
   } catch (error) {
     next(error);
   }

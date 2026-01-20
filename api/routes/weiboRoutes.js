@@ -1,8 +1,13 @@
 import express from 'express';
-import { getWeiboData } from '../services/weiboService.js';
+import { WeiboService } from '../services/weiboService.js';
 
 const router = express.Router();
 
+/**
+ * GET /api/v1/weibo/:statusId
+ * Get Weibo video data
+ * Query: { url: string }
+ */
 router.get('/:statusId', async (req, res, next) => {
   try {
     const { statusId } = req.params;
@@ -10,23 +15,15 @@ router.get('/:statusId', async (req, res, next) => {
     if (!statusId) {
       return res.status(400).json({
         success: false,
-        error: 'Status ID is required',
+        error: {
+          message: 'Invalid Weibo URL',
+          code: 'Status ID is required',
+        },
       });
     }
 
-    const data = await getWeiboData(statusId);
-
-    if (data.error) {
-      return res.status(200).json({
-        success: true,
-        data,
-      });
-    }
-
-    res.json({
-      success: true,
-      data,
-    });
+    const result = await WeiboService.getWeiboData(statusId);
+    res.json(result);
   } catch (error) {
     next(error);
   }
