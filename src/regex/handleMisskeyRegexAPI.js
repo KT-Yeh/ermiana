@@ -1,13 +1,12 @@
 import { handleAPIRequest, typingSender, embedSuppresser } from './apiHandlerHelper.js';
 
 export async function misskeyHandler(result, message, spoiler) {
-  const instanceHost = result[1];
-  const noteId = result[2];
+  const noteId = result[1];
 
   typingSender(message);
   try {
     await handleAPIRequest({
-      apiPath: `/api/v1/misskey/${instanceHost}/${noteId}`,
+      apiPath: `/api/v1/misskey/${noteId}`,
       message,
       spoiler,
     });

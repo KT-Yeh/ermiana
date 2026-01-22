@@ -1,10 +1,10 @@
 import { EmbedBuilder } from 'discord.js';
 import axios from 'axios';
+import { configManager } from '../utils/configManager.js';
 import { messageSender } from '../events/messageSender.js';
 import { messageSenderMore } from '../events/messageSenderMore.js';
 import { messageSenderPixiv } from '../events/messageSenderPixiv.js';
 import { backupLinkSender } from '../events/backupLinkSender.js';
-import { configManager } from '../utils/configManager.js';
 
 export async function embedSuppresser(message) {
   try {
