@@ -16,7 +16,7 @@ export async function reloadLog(serverCount, totalUserCount) {
       avatarURL: 'https://cdn.discordapp.com/avatars/1078919650764652594/45d5f492295af445b65299dd6fb806b1.png',
       embeds: [reloadEmbed],
     });
-  } catch (error) {
+  } catch {
     console.log('reloadLog error');
   }
 }
@@ -40,7 +40,7 @@ export async function guildLog(guild) {
       avatarURL: 'https://cdn.discordapp.com/avatars/1078919650764652594/45d5f492295af445b65299dd6fb806b1.png',
       embeds: [guildCreateEmbed],
     });
-  } catch (error) {
+  } catch {
     console.log('guildLog error');
   }
 }

@@ -1,4 +1,3 @@
-// API handlers - 統一使用 API 處理器
 import { twitterHandler } from './handleTwitterRegexAPI.js';
 import { pixivHandler } from './handlePixivRegexAPI.js';
 import { plurkHandler } from './handlePlurkRegexAPI.js';

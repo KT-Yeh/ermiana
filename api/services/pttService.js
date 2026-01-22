@@ -101,7 +101,7 @@ export class PttService {
               enhancedDescription = mopttResp.data.description;
             }
           }
-        } catch (mopttError) {
+        } catch  {
         // Use content from main PTT if moptt fails
           if (mainContent) {
             const contentPic = getMainContent(mainContent);
@@ -137,7 +137,7 @@ export class PttService {
       }
 
       throw new Error('Primary PTT source failed');
-    } catch (error) {
+    } catch {
     // Try backup PTT source
       try {
         await new Promise((resolve) => setTimeout(resolve, 1800));
@@ -212,7 +212,7 @@ export class PttService {
         }
 
         throw new Error('Backup PTT source failed');
-      } catch (backupError) {
+      } catch  {
         return createStandardResponse({
           success: true,
           style: 'backup',
