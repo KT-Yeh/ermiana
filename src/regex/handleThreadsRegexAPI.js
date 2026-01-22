@@ -1,14 +1,21 @@
-import { handleAPIRequest, typingSender, embedSuppresser } from './apiHandlerHelper.js';
+import { handleAPIRequest } from './apiHandlerHelper.js';
 import { backupLinkSender } from '../events/backupLinkSender.js';
 
 export async function threadsHandler(result, message, spoiler) {
   const url = result[0];
 
-  typingSender(message);
   try {
-    await backupLinkSender(message, spoiler, url.replace(/threads\.net/, 'fixthreads.net'));
-    embedSuppresser(message);
+    await handleAPIRequest({
+      apiPath: `/api/v1/threads?url=${encodeURIComponent(url)}`,
+      message,
+      spoiler,
+    });
   } catch {
-    // backup link failed; no further action
+    // send backup link with domain-agnostic replacement
+    try {
+      await backupLinkSender(message, spoiler, url.replace(/threads\.(?:net|com)/, 'fixthreads.net'));
+    } catch {
+      // ignore backup send errors
+    }
   }
 }

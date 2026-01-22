@@ -116,80 +116,56 @@ export async function handleAPIRequest(options) {
       // 根據 style 選擇對應的發送函數
       switch (data.style) {
         case 'normal':
-          await messageSender(message, spoiler, embed);
+          await messageSender(message, spoiler, embed).then(() => {
+            embedSuppresser(message);
+          });
           break;
 
         case 'more':
           if (data.imageArray && Array.isArray(data.imageArray)) {
-            await messageSenderMore(message, spoiler, embed, data.imageArray);
+            await messageSenderMore(message, spoiler, embed, data.imageArray).then(() => {
+              embedSuppresser(message);
+            });
           } else {
-            await messageSender(message, spoiler, embed);
+            await messageSender(message, spoiler, embed).then(() => {
+              embedSuppresser(message);
+            });
           }
           break;
 
         case 'pixiv':
           if (data.imagePixiv && data.imagePixiv.count) {
-            await messageSenderPixiv(message, spoiler, embed, data.imagePixiv.count);
+            await messageSenderPixiv(message, spoiler, embed, data.imagePixiv.count).then(() => {
+              embedSuppresser(message);
+            });
           } else {
-            await messageSender(message, spoiler, embed);
+            await messageSender(message, spoiler, embed).then(() => {
+              embedSuppresser(message);
+            });
           }
           break;
 
         case 'backup':
           if (data.rollback) {
-            await backupLinkSender(message, spoiler, data.rollback);
-            embedSuppresser(message);
+            await backupLinkSender(message, spoiler, data.rollback).then(() => {
+              embedSuppresser(message);
+            });
           } else {
-            await messageSender(message, spoiler, embed);
+            await messageSender(message, spoiler, embed).then(() => {
+              embedSuppresser(message);
+            });
           }
           break;
 
         default:
-          await messageSender(message, spoiler, embed);
+          await messageSender(message, spoiler, embed).then(() => {
+            embedSuppresser(message);
+          });
       }
     } else {
       embedSuppresser(message);
     }
   } catch {
     embedSuppresser(message);
-  }
-}
-
-/* 統一的 POST API 調用處理器 */
-export async function handleAPIPostRequest(options) {
-  const { platform, apiPath, message, spoiler, postData, buildEmbed, sendMessage } = options;
-
-  typingSender(message);
-  const config = await configManager();
-
-  try {
-    const apiResp = await axios.request({
-      method: 'post',
-      url: `${config.BOT_USE_API_URL}${apiPath}`,
-      data: postData,
-      timeout: 5000,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (apiResp.status === 200 && apiResp.data.success) {
-      const data = apiResp.data.data;
-      const platformConfig = apiResp.data.platform;
-
-      const embed = new EmbedBuilder();
-      embed.setColor(platformConfig.color);
-
-      await buildEmbed(embed, data, platformConfig);
-      await sendMessage(message, spoiler, platformConfig.iconURL, embed, data);
-
-      embedSuppresser(message);
-    } else {
-      throw new Error('API returned unsuccessful response');
-    }
-  } catch (error) {
-    const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
-    console.error(`${platformName} API handler error:`, error.message);
-    console.log(`${platform} error: ${message.guild.name}`);
   }
 }
