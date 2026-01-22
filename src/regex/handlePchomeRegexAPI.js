@@ -1,6 +1,4 @@
-import { handleAPIRequest } from './apiHandlerHelper.js';
-import { typingSender } from '../events/typingSender.js';
-import { embedSuppresser } from '../events/embedSuppresser.js';
+import { handleAPIRequest, typingSender, embedSuppresser } from './apiHandlerHelper.js';
 
 export async function pchomeHandler(result, message, spoiler) {
   const productId = result[1];

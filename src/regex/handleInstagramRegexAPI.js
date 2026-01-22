@@ -1,7 +1,6 @@
 // import { handleAPIRequest } from './apiHandlerHelper.js';
-import { typingSender } from '../events/typingSender.js';
+import { typingSender, embedSuppresser } from './apiHandlerHelper.js';
 import { backupLinkSender } from '../events/backupLinkSender.js';
-import { embedSuppresser } from '../events/embedSuppresser.js';
 
 export async function instagramHandler(result, message, spoiler) {
   const postId = result[1];

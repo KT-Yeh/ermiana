@@ -1,12 +1,28 @@
 import { EmbedBuilder } from 'discord.js';
 import axios from 'axios';
-import { typingSender } from '../events/typingSender.js';
-import { embedSuppresser } from '../events/embedSuppresser.js';
 import { messageSender } from '../events/messageSender.js';
 import { messageSenderMore } from '../events/messageSenderMore.js';
 import { messageSenderPixiv } from '../events/messageSenderPixiv.js';
 import { backupLinkSender } from '../events/backupLinkSender.js';
 import { configManager } from '../utils/configManager.js';
+
+export async function embedSuppresser(message) {
+  try {
+    if (message.deletable) {
+      await message.suppressEmbeds(true);
+    }
+  } catch {
+    // console.log('no permission');
+  }
+}
+
+export async function typingSender(message) {
+  try {
+    await message.channel.sendTyping();
+  } catch {
+    // console.log('send typing error');
+  }
+}
 
 /**
  * 根據標準化 API 回應創建 Embed
