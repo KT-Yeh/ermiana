@@ -7,11 +7,11 @@ export class ThreadsService {
 
     // Try fixthreads.net
     try {
-      const fixedUrl = videoUrl.replace(/threads\.com/, 'fixthreads.net');
+      const fixedUrl = videoUrl.replace(/threads\.(?:com|net)/, 'fixthreads.net');
       const response = await axios.request({
         url: 'https://fixthreads.net/health',
         method: 'get',
-        timeout: 1500,
+        timeout: 2500,
       });
 
       if (response.status === 200) {
@@ -22,7 +22,7 @@ export class ThreadsService {
     } catch {
       // Use default fixthreads URL
       console.error('Threads API Error: ' + videoUrl);
-      proxyUrl = videoUrl.replace(/threads\.com/, 'fixthreads.net');
+      proxyUrl = videoUrl.replace(/threads\.(?:com|net)/, 'fixthreads.net');
     }
 
     if (proxyUrl === videoUrl) {

@@ -184,9 +184,9 @@ const API_ENDPOINTS = [
     method: 'GET',
     path: '/api/v1/threads?url=xxx',
     examples: [
-      'https://www.threads.com/@kawin.travel/post/DTaC6CXk50M',
+      'https://www.threads.net/@kawin.travel/post/DTaC6CXk50M',
       'https://www.threads.com/@yaywusiiszd6924842/post/DTaUvHrD1Sg',
-      'https://www.threads.com/@money85cc/post/DTagbAlEs1m',
+      'https://www.threads.net/@money85cc/post/DTagbAlEs1m',
     ],
     parameters: [
       { name: 'url', label: 'Threads URL', type: 'text', required: true, placeholder: 'https://www.threads.net/@username/post/ABC123xyz' },

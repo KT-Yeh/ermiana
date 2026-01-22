@@ -26,7 +26,7 @@ export const regexsMap = new Map([
   [/https:\/\/24h\.pchome\.com\.tw\/prod\/([A-Z0-9]{6}-[A-Z0-9]{9})/, pchomeHandler],
   [/https:\/\/www\.instagram\.com\/(?:p|reel)\/([a-zA-Z0-9-_]+)/, instagramHandler],
   [/https:\/\/www\.instagram\.com\/[A-Za-z0-9_.]+\/(?:p|reel)\/([a-zA-Z0-9-_]+)/, instagramHandler],
-  [/https:\/\/www\.threads\.net\/@[A-Za-z0-9_.]+\/post\/[a-zA-Z0-9-_]+/, threadsHandler],
+  [/https:\/\/www\.threads\.(?:net|com)\/@[A-Za-z0-9_.]+\/post\/[a-zA-Z0-9-_]+/, threadsHandler],
   [/https?:\/\/www\.ptt\.cc\/bbs\/([a-zA-Z-_]+)\/(M\.[0-9]+\.A\.[0-9A-Z]+)\.html/, pttHandler],
   [/https:\/\/m\.weibo\.cn\/detail\/([0-9]+)/, weiboHandler],
   [/https:\/\/bsky\.app\/profile\/([a-zA-Z0-9-.]+)\/post\/([a-zA-Z0-9]{10,16})/, blueskyHandler],

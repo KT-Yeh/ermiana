@@ -12,7 +12,7 @@ router.get('/', async (req, res, next) => {
   try {
     const { url } = req.query;
 
-    if (!url || !url.includes('threads.com')) {
+    if (!url || (!url.includes('threads.com') && !url.includes('threads.net'))) {
       return res.status(400).json({
         success: false,
         error: {
