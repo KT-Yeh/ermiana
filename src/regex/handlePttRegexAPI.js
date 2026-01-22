@@ -1,4 +1,4 @@
-import { handleAPIRequest } from './apiHandlerHelper.js';
+import { handleAPIRequest, embedSuppresser } from './apiHandlerHelper.js';
 import { backupLinkSender } from '../events/backupLinkSender.js';
 
 export async function pttHandler(result, message, spoiler) {
@@ -13,7 +13,9 @@ export async function pttHandler(result, message, spoiler) {
     });
   } catch {
     try {
-      await backupLinkSender(message, spoiler, `https://www.pttweb.cc/bbs/${board}/${postId}`);
+      await backupLinkSender(message, spoiler, `https://www.pttweb.cc/bbs/${board}/${postId}`).then(() => {
+        embedSuppresser(message);
+      });
     } catch {
       // backup link failed; no further action
     }

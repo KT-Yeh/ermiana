@@ -1,4 +1,4 @@
-import { handleAPIRequest } from './apiHandlerHelper.js';
+import { handleAPIRequest, embedSuppresser } from './apiHandlerHelper.js';
 import { backupLinkSender } from '../events/backupLinkSender.js';
 
 export async function threadsHandler(result, message, spoiler) {
@@ -13,7 +13,9 @@ export async function threadsHandler(result, message, spoiler) {
   } catch {
     // send backup link with domain-agnostic replacement
     try {
-      await backupLinkSender(message, spoiler, url.replace(/threads\.(?:net|com)/, 'fixthreads.net'));
+      await backupLinkSender(message, spoiler, url.replace(/threads\.(?:net|com)/, 'fixthreads.net')).then(() => {
+        embedSuppresser(message);
+      });
     } catch {
       // ignore backup send errors
     }

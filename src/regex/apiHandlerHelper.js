@@ -16,14 +16,6 @@ export async function embedSuppresser(message) {
   }
 }
 
-export async function typingSender(message) {
-  try {
-    await message.channel.sendTyping();
-  } catch {
-    // console.log('send typing error');
-  }
-}
-
 /**
  * 根據標準化 API 回應創建 Embed
  * @param {Object} data - API 返回的標準化數據
@@ -98,11 +90,10 @@ function createEmbedFromAPI(data) {
  */
 export async function handleAPIRequest(options) {
   const { apiPath, message, spoiler } = options;
-
-  typingSender(message);
   const config = await configManager();
 
   try {
+    await message.channel.sendTyping();
     const apiResp = await axios.request({
       method: 'get',
       url: `${config.BOT_USE_API_URL}${apiPath}`,

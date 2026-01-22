@@ -1,4 +1,4 @@
-import { handleAPIRequest } from './apiHandlerHelper.js';
+import { handleAPIRequest, embedSuppresser } from './apiHandlerHelper.js';
 import { backupLinkSender } from '../events/backupLinkSender.js';
 
 export async function blueskyHandler(result, message, spoiler) {
@@ -13,7 +13,9 @@ export async function blueskyHandler(result, message, spoiler) {
     });
   } catch {
     try {
-      await backupLinkSender(message, spoiler, `https://bskx.app/profile/${did}/post/${rkey}`);
+      await backupLinkSender(message, spoiler, `https://bskx.app/profile/${did}/post/${rkey}`).then(() => {
+        embedSuppresser(message);
+      });
     } catch {
       // backup link failed; no further action
     }
