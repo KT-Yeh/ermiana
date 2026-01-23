@@ -1,4 +1,4 @@
-﻿# deno 
+﻿# /deno 
 
 此資料夾包含以 **TypeScript** 開發、並部署在 **Deno Deploy** 的小工具。
 

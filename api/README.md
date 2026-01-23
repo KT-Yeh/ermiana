@@ -1,6 +1,6 @@
-# API 統一回傳格式修改指南
+# /api
 
-## 統一格式規範
+## 統一回傳格式規範
 
 所有 API 必須回傳以下格式（所有欄位皆為**字串**）：
 
@@ -36,7 +36,7 @@
     text: "ermiana",                  // 預設值
     iconurl: "https://ermiana.canaria.cc/pic/canaria.png"  // 預設值
   },
-  rollback: "備用連結 URL",            // 可選 (style = backup 時使用)
+  rollback: "備用連結 URL",            // 可選 (style = backup)
   timestamp: 1234567890               // 可選，毫秒時間戳記
 }
 ```
@@ -190,8 +190,8 @@ return createErrorResponse('錯誤訊息', 'ERROR_CODE');
 - ✅ Twitter Service
 - ✅ Pixiv Service
 - ✅ Bilibili Service
-- ⏳ Bluesky Service (進行中)
-- ⏳ Plurk Service (進行中)
+- ⏳ Bluesky Service 
+- ⏳ Plurk Service 
 - ⏳ Threads Service
 - ⏳ Instagram Service
 - ⏳ TikTok Service
